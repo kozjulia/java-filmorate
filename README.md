@@ -20,4 +20,3 @@ public class Main {
 }
 ```
 ------
-О том, как научиться создавать такие приложения, можно узнать в [Яндекс-Практикуме](https://practicum.yandex.ru/java-developer/ "Тут учат Java!")

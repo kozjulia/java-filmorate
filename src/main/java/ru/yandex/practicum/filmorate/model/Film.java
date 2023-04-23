@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 
 @Data
 @NoArgsConstructor
@@ -24,13 +25,14 @@ public class Film {
     @NonNull
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate releaseDate; // дата релиза
+    @Positive
     private int duration; // продолжительность
     private int rate; // рейтинг
 
     public static int filmsId = 1; // сквозной счетчик
 
     public Film(@NonNull @NotBlank String name, @NonNull String description,
-                @NonNull LocalDate releaseDate, int duration) {
+                @NonNull LocalDate releaseDate, @Positive int duration) {
         this.id = filmsId++;
         this.name = name;
         this.description = description;
@@ -39,7 +41,7 @@ public class Film {
     }
 
     public Film(int id, @NonNull @NotBlank String name, @NonNull String description,
-                @NonNull LocalDate releaseDate, int duration) {
+                @NonNull LocalDate releaseDate, @Positive int duration) {
         this.id = id;
         this.name = name;
         this.description = description;

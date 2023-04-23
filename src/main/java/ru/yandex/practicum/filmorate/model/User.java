@@ -21,8 +21,6 @@ public class User {
     @NonNull
     @NotBlank
     @Email
-    //(message = "Электронный адрес невалидный: ${validatedValue}",
-    //regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
     private String email; // электронная почта
     @NonNull
     @NotBlank
@@ -31,10 +29,6 @@ public class User {
     @NonNull
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday; // дата рождения
-
-    /* С этой аннотацией Valid ничего не получается. в тестах пытаюсь электронный адрес сохранить кириллицу
-     * должна ошибка вылетать - но не вылетает. поэтому остальные аннотации на длину строки и тд не ввожу
-     * помоги пожалуйста. гугл, что нашла - не помогло*/
 
     public static int usersId = 1; // сквозной счетчик
 

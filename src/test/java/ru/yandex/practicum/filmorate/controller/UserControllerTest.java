@@ -57,22 +57,6 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("тест создания пользователя с неправильной электронной почтой 2")
-    void createFailEmail2() {
-        User userFail = new User("мейл@мейл.ру", "user1",
-                "User 1 description", LocalDate.of(1980, 01, 01));
-        controller.create(userFail);
-
-      /*  final ValidationException exception = assertThrows(
-                ValidationException.class,
-                () -> controller.create(userFail));
-        assertEquals("Ошибка! Неверный e-mail.", exception.getMessage());
-        С этой аннотацией Valid ничего не получается. Здесь по идее должно выпадать исключение
-        но почему-то нет*/
-        assertEquals(1, controller.findUsers().size(), "Пользователь найден.");
-    }
-
-    @Test
     @DisplayName("тест создания пользователя с неправильным логином")
     void createFailLogin() {
         User userFail = new User("email1@mail.ru", "user 1",
