@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -17,7 +18,7 @@ import java.time.LocalDate;
 @Validated
 public class User {
 
-    private int id; // целочисленный идентификатор
+    private long id; // целочисленный идентификатор
     @NonNull
     @NotBlank
     @Email
@@ -29,21 +30,22 @@ public class User {
     @NonNull
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday; // дата рождения
+    private Set<Long> friends; // друзья
 
-    public static int usersId = 1; // сквозной счетчик
+    //public static int usersId = 1; // сквозной счетчик
 
     public User(@NonNull @NotBlank @Email String email, @NonNull @NotBlank String login,
                 @NonNull LocalDate birthday) {
-        this.id = usersId++;
+        //this.id = usersId++;
         this.email = email;
         this.login = login;
-        this.name = login;
+        //this.name = login;
         this.birthday = birthday;
     }
 
     public User(@NonNull @NotBlank @Email String email, @NonNull @NotBlank String login,
                 String name, @NonNull LocalDate birthday) {
-        this.id = usersId++;
+        //this.id = usersId++;
         this.email = email;
         this.login = login;
         this.name = name;
