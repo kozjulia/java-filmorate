@@ -1,17 +1,21 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.util.ValidatorControllers;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+
+import org.springframework.stereotype.Component;
 
 @Component
-public class InMemoryUserStorage implements UserStorage{
+public class InMemoryUserStorage implements UserStorage {
 
-    protected final Map<Long, User> users = new HashMap<>();
-    private static long usersId = 1;  // сквозной счетчик
+    private final Map<Long, User> users = new HashMap<>();
+    public static long usersId = 0;  // сквозной счетчик пользователей
 
     @Override
     public User create(User user) {
@@ -23,8 +27,8 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
     public User update(User user) {
-        if (!users.containsKey(user.getId())) {
-            ValidatorControllers.logAndError("Ошибка! Невозможно обновить пользователя - его не существует.");
+        if (findUserById(user.getId()) == null) {
+            return null;
         }
         user = validate(user);
         users.put(user.getId(), user);
@@ -47,51 +51,15 @@ public class InMemoryUserStorage implements UserStorage{
     }
 
     @Override
-    public void addInFriends(User friendRequest, User friendResponse) {
-        Set<Long> friends = new HashSet<>();
-        friends.addAll(users.get(friendRequest.getId()).getFriends());
-        friends.add(friendResponse.getId());
-        friendRequest.setFriends(friends);
-        users.put(friendRequest.getId(), friendRequest);
-
-        friends.clear();
-        friends.addAll(users.get(friendResponse.getId()).getFriends());
-        friends.add(friendRequest.getId());
-        friendResponse.setFriends(friends);
-        users.put(friendResponse.getId(), friendResponse);
-    }
-
-    @Override
-    public void deleteFromFriends(User friendRequest, User friendResponse) {
-        Set<Long> friends = new HashSet<>();
-        friends.addAll(users.get(friendRequest.getId()).getFriends());
-        friends.remove(friendResponse.getId());
-        friendRequest.setFriends(friends);
-        users.put(friendRequest.getId(), friendRequest);
-
-        friends.clear();
-        friends.addAll(users.get(friendResponse.getId()).getFriends());
-        friends.remove(friendRequest.getId());
-        friendResponse.setFriends(friends);
-        users.put(friendResponse.getId(), friendResponse);
-    }
-
-    @Override
-    public List<User> findMutualFriends(User friendRequest, User friendResponse) {
-        Set<Long> setFriendsRequest = new HashSet<>();
-        setFriendsRequest.addAll(friendRequest.getFriends());
-
-        Set<Long> setFriendsResponse = new HashSet<>();
-        setFriendsResponse.addAll(friendResponse.getFriends());
-
-        return setFriendsRequest.stream()
-                .filter(i -> setFriendsResponse.contains(i))
-                .map(i -> users.get(i))
-                .collect(Collectors.toList());
+    public User findUserById(long userId) {
+        if (users.get(userId) == null) {
+            throw new UserNotFoundException(String.format("Пользователь № %d не найден", userId));
+        }
+        return users.get(userId);
     }
 
     private static Long getNextId() {
-        return usersId++;
+        return ++usersId;
     }
 
     private User validate(User user) {
@@ -99,16 +67,8 @@ public class InMemoryUserStorage implements UserStorage{
         ValidatorControllers.validateLogin(user.getLogin());
         user = validateName(user);
         ValidatorControllers.validateBirthday(user.getBirthday());
-        //user = validateId(user);
         return user;
     }
-
-    /*private User validateId(User user) {
-        if (user.getId() == 0) {
-            user.setId(User.usersId++);
-        }
-        return user;
-    }*/
 
     private User validateName(User user) {
         if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {

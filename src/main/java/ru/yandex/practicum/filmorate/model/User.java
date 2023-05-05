@@ -1,20 +1,19 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.time.LocalDate;
-import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Validated
 public class User {
 
@@ -30,25 +29,6 @@ public class User {
     @NonNull
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday; // дата рождения
-    private Set<Long> friends; // друзья
+    private Set<Long> friends = new HashSet<>(); // друзья
 
-    //public static int usersId = 1; // сквозной счетчик
-
-    public User(@NonNull @NotBlank @Email String email, @NonNull @NotBlank String login,
-                @NonNull LocalDate birthday) {
-        //this.id = usersId++;
-        this.email = email;
-        this.login = login;
-        //this.name = login;
-        this.birthday = birthday;
-    }
-
-    public User(@NonNull @NotBlank @Email String email, @NonNull @NotBlank String login,
-                String name, @NonNull LocalDate birthday) {
-        //this.id = usersId++;
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = birthday;
-    }
 }

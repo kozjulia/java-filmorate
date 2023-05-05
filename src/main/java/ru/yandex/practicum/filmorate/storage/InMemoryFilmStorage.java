@@ -1,18 +1,18 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.util.ValidatorControllers;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
 
 @Component
-public class InMemoryFilmStorage implements FilmStorage{
+public class InMemoryFilmStorage implements FilmStorage {
 
-    protected final Map<Long, Film> films = new HashMap<>();
-    private static long filmsId = 1;  // сквозной счетчик
+    private final Map<Long, Film> films = new HashMap<>();
+    public static long filmsId = 0;  // сквозной счетчик фильмов
 
     @Override
     public Film create(Film film) {
@@ -24,9 +24,10 @@ public class InMemoryFilmStorage implements FilmStorage{
 
     @Override
     public Film update(Film film) {
-        if (!films.containsKey(film.getId())) {
-            ValidatorControllers.logAndError("Ошибка! Невозможно обновить фильм - его не существует.");
+        if (findFilmById(film.getId()) == null) {
+            return null;
         }
+
         validate(film);
         films.put(film.getId(), film);
         return film;
@@ -44,39 +45,20 @@ public class InMemoryFilmStorage implements FilmStorage{
     }
 
     @Override
-    public void like(Film film, User user) {
-        Set<Long> Likes = new HashSet<>();
-        Likes.addAll(films.get(film.getId()).getLikes());
-        Likes.add(user.getId());
-        film.setLikes(Likes);
-        films.put(film.getId(), film);
-    }
-
-    @Override
-    public void dislike(Film film, User user) {
-        Set<Long> Likes = new HashSet<>();
-        Likes.addAll(films.get(film.getId()).getLikes());
-        Likes.remove(user.getId());
-        film.setLikes(Likes);
-        films.put(film.getId(), film);
-    }
-
-    @Override
-    public List<Film> findPopularFilms() {
-        return films.values().stream()
-                .sorted((f1, f2) -> compare(f1, f2))
-                .limit(10)
-                .map(i -> films.get(i))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<Film> findFilms() {
         return new ArrayList<>(films.values());
     }
 
+    @Override
+    public Film findFilmById(long filmId) {
+        if (films.get(filmId) == null) {
+            throw new FilmNotFoundException(String.format("Фильм № %d не найден", filmId));
+        }
+        return films.get(filmId);
+    }
+
     private static Long getNextId() {
-        return filmsId++;
+        return ++filmsId;
     }
 
     private Film validate(Film film) {
@@ -84,19 +66,7 @@ public class InMemoryFilmStorage implements FilmStorage{
         ValidatorControllers.validateDescription(film.getDescription());
         ValidatorControllers.validateReleaseDate(film.getReleaseDate());
         ValidatorControllers.validateDuration(film.getDuration());
-        //film = validateId(film);
         return film;
     }
-
-    private int compare(Film film1, Film film2) {
-        return film2.getLikes().size() - film1.getLikes().size();
-    }
-
-   /* private Film validateId(Film film) {
-        if (film.getId() == 0) {
-            film.setId(Film.filmsId++);
-        }
-        return film;
-    }*/
 
 }
