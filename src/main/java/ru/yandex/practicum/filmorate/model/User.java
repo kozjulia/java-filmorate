@@ -14,7 +14,6 @@ import javax.validation.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
-@Validated
 public class User {
 
     private long id; // целочисленный идентификатор

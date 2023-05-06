@@ -8,7 +8,7 @@ import java.util.*;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
@@ -17,13 +17,9 @@ import javax.validation.Valid;
 @RequestMapping("/films")
 @Slf4j
 @Validated
+@RequiredArgsConstructor
 public class FilmController {
     private final FilmService filmService;
-
-    @Autowired
-    public FilmController(FilmService filmService) {
-        this.filmService = filmService;
-    }
 
     @PostMapping
     @Validated
@@ -45,7 +41,7 @@ public class FilmController {
 
     @DeleteMapping
     @Validated
-    // обновление фильма
+    // удаление фильма
     public void delete(@Valid @RequestBody Film film) {
         filmService.delete(film);
         log.debug("Удалён фильм: {}", film);

@@ -7,7 +7,7 @@ import java.util.*;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
@@ -16,13 +16,9 @@ import javax.validation.Valid;
 @RequestMapping("/users")
 @Slf4j
 @Validated
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @PostMapping
     @Validated
@@ -44,7 +40,7 @@ public class UserController {
 
     @DeleteMapping
     @Validated
-    // обновление фильма
+    // удаление пользователя
     public void delete(@Valid @RequestBody User user) {
         userService.delete(user);
         log.debug("Удалён пользователь: {}", user);

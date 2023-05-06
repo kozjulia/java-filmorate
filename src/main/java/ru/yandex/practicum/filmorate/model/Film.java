@@ -6,7 +6,6 @@ import java.util.Set;
 
 import lombok.Data;
 import lombok.NonNull;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
@@ -14,7 +13,6 @@ import javax.validation.constraints.Positive;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
-@Validated
 public class Film {
 
     private long id; // целочисленный идентификатор
