@@ -6,7 +6,6 @@ import java.util.Set;
 
 import lombok.Data;
 import lombok.NonNull;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
