@@ -1,13 +1,16 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
+import java.time.LocalDate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +20,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FilmControllerTest {
 
+    private InMemoryFilmStorage filmStorage;
+    private UserStorage userStorage;
+    private FilmService service;
     private FilmController controller;
     private Film film1;
     private Film film2;
@@ -24,37 +30,42 @@ class FilmControllerTest {
 
     @BeforeEach
     public void beforeEach() {
-        controller = new FilmController();
-        Film.filmsId = 1;
+        filmStorage = new InMemoryFilmStorage();
+        userStorage = new InMemoryUserStorage();
+        service = new FilmService(filmStorage, userStorage);
+        controller = new FilmController(service);
+        filmStorage.filmsId = 0;
         film1 = new Film("film 1", "FIlm 1 description",
-                LocalDate.of(2000, 01, 01), 180);
+                LocalDate.of(2000, 01, 01));
+        film1.setDuration(180);
         film2 = new Film("film 2", "FIlm 2 description",
-                LocalDate.of(2010, 02, 22), 122);
+                LocalDate.of(2010, 02, 22));
+        film2.setDuration(122);
         film3 = new Film("film 1", "FIlm 1 description",
-                LocalDate.of(2020, 03, 31), 209);
+                LocalDate.of(2020, 03, 31));
+        film3.setDuration(209);
     }
 
     @Test
     @DisplayName("тест создания фильма")
     void create() {
         controller.create(film1);
-        final Map<Integer, Film> films = new HashMap<>(controller.films);
+        final List<Film> films = new ArrayList<>(controller.findFilms());
 
         assertNotNull(films, "Фильм не найден.");
         assertEquals(1, films.size(), "Неверное количество фильмов.");
-        assertTrue(films.containsKey(1), "Фильм не совпадает.");
-        assertEquals(film1, films.get(1), "Фильм не совпадает.");
+        assertTrue(films.contains(film1), "Фильм не совпадает.");
+        assertEquals(film1, films.get(0), "Фильм не совпадает.");
     }
 
     @Test
     @DisplayName("тест создания фильма с неправильным названием")
     void createFailName() {
-        Film filmFail = new Film(" ", "FIlm fail description",
-                LocalDate.of(2000, 01, 01), 180);
+        film1.setName(" ");
 
         final ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> controller.create(filmFail));
+                () -> controller.create(film1));
         assertEquals("Ошибка! Название не может быть пустым.", exception.getMessage());
         assertEquals(0, controller.findFilms().size(), "Фильм найден.");
     }
@@ -62,14 +73,11 @@ class FilmControllerTest {
     @Test
     @DisplayName("тест создания фильма с неправильным описанием")
     void createFailDescription() {
-        Film filmFail = new Film("film fail", "Пятеро друзей ( комик-группа «Шарло»), приезжают " +
-                "в город Бризуль. Здесь они хотят разыскать господина Огюста Куглова, который задолжал им деньги, " +
-                "а именно 20 миллионов. о Куглов, который за время «своего отсутствия», стал кандидатом Коломбани.",
-                LocalDate.of(2000, 01, 01), 180);
+        film1.setDescription("fail".repeat(51));
 
         final ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> controller.create(filmFail));
+                () -> controller.create(film1));
         assertEquals("Ошибка! Максимальная длина описания — 200 символов.",
                 exception.getMessage());
         assertEquals(0, controller.findFilms().size(), "Фильм найден.");
@@ -78,12 +86,11 @@ class FilmControllerTest {
     @Test
     @DisplayName("тест создания фильма с неправильной датой релиза")
     void createFailBirthday() {
-        Film filmFail = new Film("film fail", "FIlm fail description",
-                LocalDate.of(1890, 01, 01), 180);
+        film1.setReleaseDate(LocalDate.of(1890, 01, 01));
 
         final ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> controller.create(filmFail));
+                () -> controller.create(film1));
         assertEquals("Ошибка! Дата релиза — не раньше 28 декабря 1895 года.",
                 exception.getMessage());
         assertEquals(0, controller.findFilms().size(), "Фильм найден.");
@@ -92,12 +99,11 @@ class FilmControllerTest {
     @Test
     @DisplayName("тест создания фильма с неправильной продолжительностью")
     void createWithEmptyName() {
-        Film filmFail = new Film("film fail", "FIlm fail description",
-                LocalDate.of(2000, 01, 01), -100);
+        film1.setDuration(-100);
 
         final ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> controller.create(filmFail));
+                () -> controller.create(film1));
         assertEquals("Ошибка! Продолжительность фильма должна быть положительной.", exception.getMessage());
         assertEquals(0, controller.findFilms().size(), "Фильм найден.");
     }
@@ -106,35 +112,31 @@ class FilmControllerTest {
     @DisplayName("тест обновления фильма")
     void update() {
         controller.create(film1);
-        Film filmUpdate = new Film(1, "film update", "FIlm update description",
-                LocalDate.of(2001, 01, 01), 100, 4);
-        controller.update(filmUpdate);
-        final Map<Integer, Film> films = new HashMap<>(controller.films);
+        film2.setId(1);
+        controller.update(film2);
+        final List<Film> films = new ArrayList<>(controller.findFilms());
 
         assertNotNull(films, "Фильм не найден.");
         assertEquals(1, films.size(), "Неверное количество фильмов.");
-        assertTrue(films.containsKey(1), "Фильм не совпадает.");
-        assertNotEquals(film1, films.get(1), "Фильм совпадает.");
-        assertEquals(filmUpdate, films.get(1), "Фильм не совпадает.");
+        assertFalse(films.contains(film1), "Фильм совпадает.");
+        assertTrue(films.contains(film2), "Фильм не совпадает.");
     }
 
     @Test
     @DisplayName("тест обновления неизвестного фильма")
     void updateFail() {
         controller.create(film1);
-        Film filmUpdate = new Film(999, "film 1", "FIlm 1 description",
-                LocalDate.of(2000, 01, 01), 180, 4);
-        final ValidationException exception = assertThrows(
-                ValidationException.class,
-                () -> controller.update(filmUpdate));
-        assertEquals("Ошибка! Невозможно обновить фильм - его не существует.", exception.getMessage());
+        final FilmNotFoundException exception = assertThrows(
+                FilmNotFoundException.class,
+                () -> controller.update(film2));
+        assertEquals(String.format("Фильм № %d не найден", film2.getId()), exception.getMessage());
 
-        final Map<Integer, Film> films = new HashMap<>(controller.films);
+        final List<Film> films = new ArrayList<>(controller.findFilms());
 
         assertNotNull(films, "Фильм не найден.");
         assertEquals(1, films.size(), "Неверное количество фильмов.");
-        assertTrue(films.containsKey(1), "Фильм не совпадает.");
-        assertEquals(film1, films.get(1), "Фильм совпадает.");
+        assertTrue(films.contains(film1), "Фильм не совпадает.");
+        assertFalse(films.contains(film2), "Фильм совпадает.");
     }
 
     @Test
@@ -148,7 +150,8 @@ class FilmControllerTest {
         assertNotNull(films, "Фильмы не возвращаются.");
         assertEquals(3, films.size(), "Неверное количество фильмов.");
         assertTrue(films.contains(film1), "Фильм не записался.");
-        assertTrue(films.contains(film1), "Фильм не записался.");
-        assertTrue(films.contains(film1), "Фильм не записался.");
+        assertTrue(films.contains(film2), "Фильм не записался.");
+        assertTrue(films.contains(film3), "Фильм не записался.");
     }
+
 }

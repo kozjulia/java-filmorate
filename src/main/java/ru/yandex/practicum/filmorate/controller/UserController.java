@@ -1,12 +1,13 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.util.ValidatorControllers;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.*;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.Valid;
@@ -15,16 +16,15 @@ import javax.validation.Valid;
 @RequestMapping("/users")
 @Slf4j
 @Validated
+@RequiredArgsConstructor
 public class UserController {
-
-    protected final Map<Integer, User> users = new HashMap<>();
+    private final UserService userService;
 
     @PostMapping
     @Validated
     // создание пользователя
     public User create(@Valid @RequestBody User user) {
-        user = validate(user);
-        users.put(user.getId(), user);
+        userService.create(user);
         log.debug("Добавлен новый пользователь: {}", user);
         return user;
     }
@@ -33,41 +33,59 @@ public class UserController {
     @Validated
     // обновление пользователя
     public User update(@Valid @RequestBody User user) {
-        if (!users.containsKey(user.getId())) {
-            ValidatorControllers.logAndError("Ошибка! Невозможно обновить пользователя - его не существует.");
-        }
-        user = validate(user);
-        users.put(user.getId(), user);
+        userService.update(user);
         log.debug("Обновлен пользователь: {}", user);
         return user;
+    }
+
+    @DeleteMapping
+    @Validated
+    // удаление пользователя
+    public void delete(@Valid @RequestBody User user) {
+        userService.delete(user);
+        log.debug("Удалён пользователь: {}", user);
     }
 
     @GetMapping
     // получение списка всех пользователей
     public List<User> findUsers() {
-        return new ArrayList<>(users.values());
+        log.debug("Получен список пользователей, количество = : {}", userService.findUsers().size());
+        return userService.findUsers();
     }
 
-    private User validate(User user) {
-        ValidatorControllers.validateEmail(user.getEmail());
-        ValidatorControllers.validateLogin(user.getLogin());
-        user = validateName(user);
-        ValidatorControllers.validateBirthday(user.getBirthday());
-        user = validateId(user);
-        return user;
+    @GetMapping("/{userId}")
+    // получение пользователя по id
+    public User findUserById(@PathVariable long userId) {
+        log.debug("Получен пользователь с id = : {}", userId);
+        return userService.findUserById(userId);
     }
 
-    private User validateId(User user) {
-        if (user.getId() == 0) {
-            user.setId(User.usersId++);
-        }
-        return user;
+    @PutMapping("/{id}/friends/{friendId}")
+    //  добавление в друзья
+    public boolean addInFriends(@PathVariable long id, @PathVariable long friendId) {
+        log.debug("Пользователь c id = {} добавил в друзья пользователя с id = {}", id, friendId);
+        return userService.addInFriends(id, friendId);
     }
 
-    private User validateName(User user) {
-        if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        return user;
+    @DeleteMapping("{id}/friends/{friendId}")
+    //  удаление из друзей
+    public boolean deleteFromFriends(@PathVariable long id, @PathVariable long friendId) {
+        log.debug("Пользователь c id = {} удалил из друзей пользователя с id = {}", id, friendId);
+        return userService.deleteFromFriends(id, friendId);
     }
+
+    @GetMapping("/{id}/friends")
+    // возвращаем список пользователей, являющихся его друзьями
+    public List<User> findFriends(@PathVariable long id) {
+        log.debug("Получен список пользователей, являющимися друзьями пользователя с id = {}", id);
+        return userService.findFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    // список друзей, общих с другим пользователем
+    public List<User> findMutualFriends(@PathVariable long id, @PathVariable long otherId) {
+        log.debug("Получен список друзей пользователя с id = {}, общих с пользователем с id = {}", id, otherId);
+        return userService.findMutualFriends(id, otherId);
+    }
+
 }
