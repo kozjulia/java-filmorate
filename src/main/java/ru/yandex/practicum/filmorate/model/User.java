@@ -18,10 +18,10 @@ public class User {
     private long id; // целочисленный идентификатор
     @NonNull
     @NotBlank
-    @Email
+    @Email(message = "Ошибка! Неверный e-mail.")
     private String email; // электронная почта
     @NonNull
-    @NotBlank
+    @NotBlank(message = "Ошибка! Логин не может быть пустым.")
     private String login; // логин пользователя
     private String name; // имя для отображения
     @NonNull
