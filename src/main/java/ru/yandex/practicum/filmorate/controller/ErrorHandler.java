@@ -2,6 +2,12 @@ package ru.yandex.practicum.filmorate.controller;
 
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
+import ru.yandex.practicum.filmorate.model.ValidationErrorResponse;
+import ru.yandex.practicum.filmorate.util.Violation;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,13 +27,12 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        return new ErrorResponse(
-                e.getMessage().split("default message")[2]
-                        .replaceAll("\\[", "").replaceAll("]", "")
-        );
+    public ValidationErrorResponse handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+        final List<Violation> violations = e.getBindingResult().getFieldErrors().stream()
+                .map(error -> new Violation(error.getField(), error.getDefaultMessage()))
+                .collect(Collectors.toList());
+        return new ValidationErrorResponse(violations);
     }
-
 
     @ExceptionHandler({FilmNotFoundException.class, UserNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
