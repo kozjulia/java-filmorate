@@ -52,19 +52,20 @@ SELECT f.film_id,
        COUNT(l.like_id) AS count_likes
 FROM films AS f
 LEFT OUTER JOIN likes AS l ON f.film_id = l.film.id
-ORDER BY films.count_likes DESC
+GROUP BY f.film_id
+ORDER BY count_likes DESC
 LIMIT 10;
 
 -- список общих друзей с другим пользователем
 SELECT f1.response_friend_id
 FROM friends AS f1
-WHERE f1.request_friend = 1
+WHERE f1.request_friend_id = 1
   AND f1.is_confirm = TRUE
   AND f1.response_friend_id IN
     (SELECT response_friend_id
      FROM friends
-     WHERE response_friend_id = 3
+     WHERE request_friend_id = 3
        AND is_confirm = TRUE);
-
+ 
 ```
 ------
