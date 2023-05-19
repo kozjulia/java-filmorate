@@ -30,3 +30,41 @@ public class Main {
 }
 ```
 ------
+
+## Описание модели данных
+_____
+
+![Диаграмма баз данных проекта](/filmorate_dbs.png)
+
+##### Примеры запросов для основных операций моего приложения:
+```sql
+-- получение всех фильмов
+SELECT *
+FROM films;
+
+-- получение всех пользователей
+SELECT *
+FROM users;
+
+--  топ 10 наиболее популярных фильмов
+SELECT f.film_id,
+       f.film_name,
+       COUNT(l.like_id) AS count_likes
+FROM films AS f
+LEFT OUTER JOIN likes AS l ON f.film_id = l.film.id
+ORDER BY films.count_likes DESC
+LIMIT 10;
+
+-- список общих друзей с другим пользователем
+SELECT f1.response_friend_id
+FROM friends AS f1
+WHERE f1.request_friend = 1
+  AND f1.is_confirm = TRUE
+  AND f1.response_friend_id IN
+    (SELECT response_friend_id
+     FROM friends
+     WHERE response_friend_id = 3
+       AND is_confirm = TRUE);
+
+```
+------

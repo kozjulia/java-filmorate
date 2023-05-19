@@ -28,5 +28,7 @@ public class Film {
     private int duration; // продолжительность
     private int rate; // рейтинг
     private Set<Long> likes = new HashSet<>(); // пользователи, лайкнувшие фильм
+    private Set<String> genres = new HashSet<>(); // жанры
+    private RatingMPA ratingMpa; // рейтинг Ассоциации кинокомпаний (МРА)
 
 }
