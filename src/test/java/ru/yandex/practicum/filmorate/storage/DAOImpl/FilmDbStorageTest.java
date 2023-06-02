@@ -36,12 +36,12 @@ class FilmDbStorageTest {
 
     @BeforeEach
     public void beforeEach() {
-        RatingMPA ratingMPA3 = new RatingMPA(3, "PG-13", "детям до 13 лет просмотр не желателен");
-        RatingMPA ratingMPA4 = new RatingMPA(4, "R",
+        RatingMPA ratingMPA3 = new RatingMPA(3L, "PG-13", "детям до 13 лет просмотр не желателен");
+        RatingMPA ratingMPA4 = new RatingMPA(4L, "R",
                 "лицам до 17 лет просматривать фильм можно только в присутствии взрослого");
-        Genre genre1 = new Genre(1, "Комедия");
-        Genre genre2 = new Genre(2, "Драма");
-        Genre genre5 = new Genre(5, "Документальный");
+        Genre genre1 = new Genre(1L, "Комедия");
+        Genre genre2 = new Genre(2L, "Драма");
+        Genre genre5 = new Genre(5L, "Документальный");
         film1 = new Film("film 1", "FIlm 1 description",
                 LocalDate.of(2000, 01, 01));
         film1.setDuration(180);

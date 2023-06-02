@@ -15,7 +15,7 @@ public class RatingMPA {
     // R - лицам до 17 лет просматривать фильм можно только в присутствии взрослого
     // NC-17 - лицам до 18 лет просмотр запрещён
     @NonNull
-    private final long id; // целочисленный идентификатор
+    private final Long id; // целочисленный идентификатор
     @NotBlank(message = "Ошибка! Название не может быть пустым.")
     private final String name; // название
     @NotBlank(message = "Ошибка! Описание не может быть пустым.")

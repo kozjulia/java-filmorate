@@ -30,7 +30,7 @@ public class FilmController {
     // добавление фильма
     public Film create(@Valid @RequestBody Film film) {
         film = ValidatorControllers.validateFilm(film);
-        Film newFilm = filmService.create(film).get();
+        Film newFilm = filmService.create(film);
         log.debug("Добавлен новый фильм: {}", newFilm);
         return newFilm;
     }
@@ -39,11 +39,8 @@ public class FilmController {
     @Validated
     // обновление фильма
     public Film update(@Valid @RequestBody Film film) {
-        if (findFilmById(film.getId()).isEmpty()) {
-            return null;
-        }
         ValidatorControllers.validateFilm(film);
-        Film newFilm = filmService.update(film).get();
+        Film newFilm = filmService.update(film);
         log.debug("Обновлен фильм: {}", newFilm);
         return newFilm;
     }
@@ -65,8 +62,8 @@ public class FilmController {
 
     @GetMapping("/films/{filmId}")
     // получение пользователя по id
-    public Optional<Film> findFilmById(@PathVariable long filmId) {
-        Optional<Film> film = filmService.findFilmById(filmId);
+    public Film findFilmById(@PathVariable long filmId) {
+        Film film = filmService.findFilmById(filmId);
         log.debug("Получен фильм с id = : {}", filmId);
         return film;
     }
@@ -114,8 +111,8 @@ public class FilmController {
 
     @GetMapping("/genres/{id}")
     // получение жанра по id
-    public Optional<Genre> findGenreById(@PathVariable long id) {
-        Optional<Genre> genre = filmService.findGenreById(id);
+    public Genre findGenreById(@PathVariable long id) {
+        Genre genre = filmService.findGenreById(id);
         log.debug("Получен жанр с id = : {}", id);
         return genre;
     }
@@ -129,8 +126,8 @@ public class FilmController {
 
     @GetMapping("/mpa/{id}")
     // получение рейтинга МПА по id
-    public Optional<RatingMPA> findRatingMPAById(@PathVariable long id) {
-        Optional<RatingMPA> ratingMPA = filmService.findRatingMPAById(id);
+    public RatingMPA findRatingMPAById(@PathVariable long id) {
+        RatingMPA ratingMPA = filmService.findRatingMPAById(id);
         log.debug("Получен рейтинг МПА с id = : {}", id);
         return ratingMPA;
     }

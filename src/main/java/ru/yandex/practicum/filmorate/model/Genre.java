@@ -10,7 +10,7 @@ public class Genre {
     // жанры фильмов, могут быть несколько у одного
 
     @NonNull
-    private final long id; // целочисленный идентификатор
+    private final Long id; // целочисленный идентификатор
     @NotBlank(message = "Ошибка! Название не может быть пустым.")
     private final String name; // название
 

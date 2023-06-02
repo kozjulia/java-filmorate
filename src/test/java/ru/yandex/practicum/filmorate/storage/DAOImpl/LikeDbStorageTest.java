@@ -43,9 +43,9 @@ class LikeDbStorageTest {
 
     @BeforeEach
     public void beforeEach() {
-        ratingMPA3 = new RatingMPA(3, "PG-13", "детям до 13 лет просмотр не желателен");
-        genre1 = new Genre(1, "Комедия");
-        genre2 = new Genre(2, "Драма");
+        ratingMPA3 = new RatingMPA(3L, "PG-13", "детям до 13 лет просмотр не желателен");
+        genre1 = new Genre(1L, "Комедия");
+        genre2 = new Genre(2L, "Драма");
         film1 = new Film("film 1", "FIlm 1 description",
                 LocalDate.of(2000, 01, 01));
         film1.setDuration(180);

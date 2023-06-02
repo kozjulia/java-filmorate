@@ -27,7 +27,7 @@ public class UserController {
     // создание пользователя
     public User create(@Valid @RequestBody User user) {
         user = ValidatorControllers.validateUser(user);
-        User newUser = userService.create(user).get();
+        User newUser = userService.create(user);
         log.debug("Добавлен новый пользователь: {}", newUser);
         return newUser;
     }
@@ -36,11 +36,8 @@ public class UserController {
     @Validated
     // обновление пользователя
     public User update(@Valid @RequestBody User user) {
-        if (findUserById(user.getId()).isEmpty()) {
-            return null;
-        }
         user = ValidatorControllers.validateUser(user);
-        User newUser = userService.update(user).get();
+        User newUser = userService.update(user);
         log.debug("Обновлен пользователь: {}", newUser);
         return newUser;
     }
@@ -62,8 +59,8 @@ public class UserController {
 
     @GetMapping("/{userId}")
     // получение пользователя по id
-    public Optional<User> findUserById(@PathVariable long userId) {
-        Optional<User> user = userService.findUserById(userId);
+    public User findUserById(@PathVariable long userId) {
+        User user = userService.findUserById(userId);
         log.debug("Получен пользователь с id = : {}", userId);
         return user;
     }
@@ -71,9 +68,6 @@ public class UserController {
     @PutMapping("/{id}/friends/{friendId}")
     //  добавление в друзья
     public boolean addInFriends(@PathVariable long id, @PathVariable long friendId) {
-        if ((findUserById(id).isEmpty()) || (findUserById(friendId).isEmpty())) {
-            return false;
-        }
         log.debug("Пользователь c id = {} добавил в друзья пользователя с id = {}", id, friendId);
         return userService.addInFriends(id, friendId);
     }
@@ -81,9 +75,6 @@ public class UserController {
     @DeleteMapping("{id}/friends/{friendId}")
     //  удаление из друзей
     public boolean deleteFromFriends(@PathVariable long id, @PathVariable long friendId) {
-        if ((findUserById(id).isEmpty()) || (findUserById(friendId).isEmpty())) {
-            return false;
-        }
         log.debug("Пользователь c id = {} удалил из друзей пользователя с id = {}", id, friendId);
         return userService.deleteFromFriends(id, friendId);
     }
@@ -91,9 +82,6 @@ public class UserController {
     @GetMapping("/{id}/friends")
     // возвращаем список пользователей, являющихся его друзьями
     public List<User> findFriends(@PathVariable long id) {
-        if (findUserById(id).isEmpty()) {
-            return Collections.EMPTY_LIST;
-        }
         log.debug("Получен список пользователей, являющимися друзьями пользователя с id = {}", id);
         return userService.findFriends(id);
     }
@@ -101,9 +89,6 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     // список друзей, общих с другим пользователем
     public List<User> findMutualFriends(@PathVariable long id, @PathVariable long otherId) {
-        if ((findUserById(id).isEmpty()) || (findUserById(otherId).isEmpty())) {
-            return Collections.EMPTY_LIST;
-        }
         log.debug("Получен список друзей пользователя с id = {}, общих с пользователем с id = {}", id, otherId);
         return userService.findMutualFriends(id, otherId);
     }
