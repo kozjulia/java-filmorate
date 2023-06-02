@@ -4,8 +4,10 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryLikeStorage;
+import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
@@ -20,9 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FilmControllerTest {
 
-    private InMemoryFilmStorage filmStorage;
-    private UserStorage userStorage;
-    private FilmService service;
     private FilmController controller;
     private Film film1;
     private Film film2;
@@ -30,9 +29,10 @@ class FilmControllerTest {
 
     @BeforeEach
     public void beforeEach() {
-        filmStorage = new InMemoryFilmStorage();
-        userStorage = new InMemoryUserStorage();
-        service = new FilmService(filmStorage, userStorage);
+        InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
+        UserStorage userStorage = new InMemoryUserStorage();
+        LikeStorage likeStorage = new InMemoryLikeStorage();
+        FilmService service = new FilmService(filmStorage, userStorage, likeStorage);
         controller = new FilmController(service);
         filmStorage.filmsId = 0;
         film1 = new Film("film 1", "FIlm 1 description",
