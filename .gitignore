@@ -42,7 +42,6 @@ build/
 ### VS Code ###
 .vscode/
 
-*.db
-db/*
 /filmorate dbs.txt
 /SQL-запросы filmorate.txt
+/db/
