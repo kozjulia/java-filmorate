@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -12,13 +11,16 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
 
+    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
+    @Qualifier("friendDbStorage")
     private final FriendStorage friendStorage;
 
     public User create(User user) {
@@ -69,7 +71,7 @@ public class UserService {
             return Collections.EMPTY_LIST;
         }
         return friendStorage.findFriends(id).stream()
-                .map(userId -> findUserById(userId))
+                .map(this::findUserById)
                 .collect(Collectors.toList());
     }
 

@@ -16,14 +16,18 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class FilmService {
 
+    @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
+    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
+    @Qualifier("likeDbStorage")
     private final LikeStorage likeStorage;
 
     public Film create(Film film) {
