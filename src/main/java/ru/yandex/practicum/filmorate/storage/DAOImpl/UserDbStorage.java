@@ -54,9 +54,6 @@ public class UserDbStorage implements UserStorage {
     }
 
     public boolean delete(User user) {
-        if (findUserById(user.getId()).isEmpty()) {
-            return false;
-        }
         String sqlQuery = "delete from users where user_id = ?";
         return jdbcTemplate.update(sqlQuery, user.getId()) > 0;
     }
@@ -74,6 +71,15 @@ public class UserDbStorage implements UserStorage {
             log.warn("Пользователь № {} не найден", userId);
             throw new UserNotFoundException(String.format("Пользователь № %d не найден", userId));
         }
+    }
+
+    public boolean isFindUserById(long userId) {
+        String sqlQuery = "select exists(select 1 from users where user_id = ?)";
+        if (jdbcTemplate.queryForObject(sqlQuery, new Object[]{userId}, Boolean.class)) {
+            return true;
+        }
+        log.warn("Пользователь № {} не найден", userId);
+        throw new UserNotFoundException(String.format("Пользователь № %d не найден", userId));
     }
 
     private User makeUser(ResultSet rs, int rowNum) throws SQLException {

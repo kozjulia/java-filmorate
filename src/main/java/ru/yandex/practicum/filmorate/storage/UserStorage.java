@@ -17,4 +17,6 @@ public interface UserStorage {
 
     Optional<User> findUserById(long userId);
 
+    boolean isFindUserById(long userId);
+
 }

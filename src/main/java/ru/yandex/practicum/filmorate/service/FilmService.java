@@ -35,13 +35,16 @@ public class FilmService {
     }
 
     public Film update(Film film) {
-        if (findFilmById(film.getId()) == null) {
+        if (!filmStorage.isFindFilmById(film.getId())) {
             return null;
         }
         return filmStorage.update(film).get();
     }
 
     public boolean delete(Film film) {
+        if (!filmStorage.isFindFilmById(film.getId())) {
+            return false;
+        }
         return filmStorage.delete(film);
     }
 
@@ -58,7 +61,7 @@ public class FilmService {
     }
 
     public boolean like(long id, long userId) {
-        if (findFilmById(id) == null || userStorage.findUserById(userId).isEmpty()) {
+        if (!filmStorage.isFindFilmById(id) || !userStorage.isFindUserById(userId)) {
             return false;
         }
 
@@ -70,7 +73,7 @@ public class FilmService {
     }
 
     public boolean dislike(long id, long userId) {
-        if (findFilmById(id) == null || userStorage.findUserById(userId).isEmpty()) {
+        if (!filmStorage.isFindFilmById(id) || !userStorage.isFindUserById(userId)) {
             return false;
         }
 

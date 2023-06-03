@@ -28,13 +28,16 @@ public class UserService {
     }
 
     public User update(User user) {
-        if (findUserById(user.getId()) == null) {
+        if (!userStorage.isFindUserById(user.getId())) {
             return null;
         }
         return userStorage.update(user).get();
     }
 
     public boolean delete(User user) {
+        if (!userStorage.isFindUserById(user.getId())) {
+            return false;
+        }
         return userStorage.delete(user);
     }
 
@@ -47,7 +50,7 @@ public class UserService {
     }
 
     public boolean addInFriends(long id, long friendId) {
-        if ((findUserById(id) == null) || (findUserById(friendId) == null)) {
+        if (!userStorage.isFindUserById(id) || !userStorage.isFindUserById(friendId)) {
             return false;
         }
         User friendRequest = userStorage.findUserById(id).get();
@@ -57,7 +60,7 @@ public class UserService {
     }
 
     public boolean deleteFromFriends(long id, long friendId) {
-        if ((findUserById(id) == null) || (findUserById(friendId) == null)) {
+        if (!userStorage.isFindUserById(id) || !userStorage.isFindUserById(friendId)) {
             return false;
         }
         User friendRequest = userStorage.findUserById(id).get();
@@ -67,7 +70,7 @@ public class UserService {
     }
 
     public List<User> findFriends(long id) {
-        if (findUserById(id) == null) {
+        if (!userStorage.isFindUserById(id)) {
             return Collections.EMPTY_LIST;
         }
         return friendStorage.findFriends(id).stream()
@@ -76,7 +79,7 @@ public class UserService {
     }
 
     public List<User> findMutualFriends(long id, long otherId) {
-        if ((findUserById(id) == null) || (findUserById(otherId) == null)) {
+        if (!userStorage.isFindUserById(id) || !userStorage.isFindUserById(otherId)) {
             return Collections.EMPTY_LIST;
         }
         return findFriends(id).stream()

@@ -18,7 +18,6 @@ public class LikeDbStorage implements LikeStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public boolean like(Film film) {
-
         for (long idUser : film.getLikes()) {
             String sqlQuery = "insert into likes(user_id, film_id) " +
                     " values (?, ?)";

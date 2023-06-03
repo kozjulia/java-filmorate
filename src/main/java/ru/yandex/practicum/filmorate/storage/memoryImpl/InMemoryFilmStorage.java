@@ -47,11 +47,15 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.warn("Фильм № {} не найден", filmId);
             throw new FilmNotFoundException(String.format("Фильм № %d не найден", filmId));
         }
+        return Optional.of(films.get(filmId));
+    }
+
+    public boolean isFindFilmById(long filmId) {
         if (films.get(filmId) == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(films.get(filmId));
+            log.warn("Фильм № {} не найден", filmId);
+            throw new FilmNotFoundException(String.format("Фильм № %d не найден", filmId));
         }
+        return true;
     }
 
     public List<Genre> findGenres() {

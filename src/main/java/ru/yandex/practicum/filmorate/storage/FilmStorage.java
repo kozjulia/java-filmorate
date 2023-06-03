@@ -19,6 +19,8 @@ public interface FilmStorage {
 
     Optional<Film> findFilmById(long filmId);
 
+    boolean isFindFilmById(long filmId);
+
     List<Genre> findGenres();
 
     Optional<Genre> findGenreById(long genreId);

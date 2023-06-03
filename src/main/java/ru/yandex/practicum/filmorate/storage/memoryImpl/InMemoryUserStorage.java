@@ -45,11 +45,15 @@ public class InMemoryUserStorage implements UserStorage {
             log.warn("Пользователь № {} не найден", userId);
             throw new UserNotFoundException(String.format("Пользователь № %d не найден", userId));
         }
+        return Optional.of(users.get(userId));
+    }
+
+    public boolean isFindUserById(long userId) {
         if (users.get(userId) == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(users.get(userId));
+            log.warn("Пользователь № {} не найден", userId);
+            throw new UserNotFoundException(String.format("Пользователь № %d не найден", userId));
         }
+        return true;
     }
 
     private static Long getNextId() {

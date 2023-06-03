@@ -69,9 +69,6 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public boolean delete(Film film) {
-        if (findFilmById(film.getId()).isEmpty()) {
-            return false;
-        }
         String sqlQuery = "delete from films where film_id = ?";
         return jdbcTemplate.update(sqlQuery, film.getId()) > 0;
     }
@@ -89,6 +86,15 @@ public class FilmDbStorage implements FilmStorage {
             log.warn("Фильм № {} не найден", filmId);
             throw new FilmNotFoundException(String.format("Фильм № %d не найден", filmId));
         }
+    }
+
+    public boolean isFindFilmById(long filmId) {
+        String sqlQuery = "select exists(select 1 from films where film_id = ?)";
+        if (jdbcTemplate.queryForObject(sqlQuery, new Object[]{filmId}, Boolean.class)) {
+            return true;
+        }
+        log.warn("Фильм № {} не найден", filmId);
+        throw new FilmNotFoundException(String.format("Фильм № %d не найден", filmId));
     }
 
     public List<Genre> findGenres() {
