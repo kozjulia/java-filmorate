@@ -62,6 +62,7 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(),
                 film.getDuration(), film.getRate(), film.getMpa().getId(), film.getId());
 
+        film.setMpa(findRatingMPAById(film.getMpa().getId()).get());
         deleteGenres(film.getId());
         film = updateGenres(film);
         return Optional.of(film);
@@ -85,7 +86,7 @@ public class FilmDbStorage implements FilmStorage {
         try {
             return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeFilm, filmId));
         } catch (EmptyResultDataAccessException e) {
-            log.error("Фильм № {} не найден", filmId);
+            log.warn("Фильм № {} не найден", filmId);
             throw new FilmNotFoundException(String.format("Фильм № %d не найден", filmId));
         }
     }
@@ -142,7 +143,8 @@ public class FilmDbStorage implements FilmStorage {
 
     private List<Genre> findGenresByFilmId(Long filmId) {
         String sqlQuery = "select * from film_genre as fg " +
-                "join genres as g on g.genre_id = fg.genre_id where fg.film_id = ? order by genre_id";
+                "join genres as g on g.genre_id = fg.genre_id " +
+                "where fg.film_id = ? order by genre_id";
         return jdbcTemplate.query(sqlQuery, this::makeGenre, filmId);
     }
 

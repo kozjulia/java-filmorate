@@ -8,9 +8,11 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 
 import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Long, Film> films = new HashMap<>();
@@ -42,6 +44,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public Optional<Film> findFilmById(long filmId) {
         if (films.get(filmId) == null) {
+            log.warn("Фильм № {} не найден", filmId);
             throw new FilmNotFoundException(String.format("Фильм № %d не найден", filmId));
         }
         if (films.get(filmId) == null) {

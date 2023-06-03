@@ -91,7 +91,7 @@ public class FilmService {
     public Genre findGenreById(long genreId) {
         return filmStorage.findGenreById(genreId)
                 .orElseThrow(() -> {
-                    log.error("Жанр № {} не найден", genreId);
+                    log.warn("Жанр № {} не найден", genreId);
                     throw new GenreNotFoundException(String.format("Жанр № %d не найден", genreId));
                 });
     }
@@ -103,7 +103,7 @@ public class FilmService {
     public RatingMPA findRatingMPAById(long ratingMPAId) {
         return filmStorage.findRatingMPAById(ratingMPAId)
                 .orElseThrow(() -> {
-                    log.error("Рейтинг МПА № {} не найден", ratingMPAId);
+                    log.warn("Рейтинг МПА № {} не найден", ratingMPAId);
                     throw new RatingMPANotFoundException(String.format("Рейтинг МПА № %d не найден", ratingMPAId));
                 });
     }

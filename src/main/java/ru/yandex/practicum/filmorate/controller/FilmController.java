@@ -56,15 +56,16 @@ public class FilmController {
     @GetMapping("/films")
     // получение всех фильмов
     public List<Film> findFilms() {
-        log.debug("Получен список фильмов, количество = : {}", filmService.findFilms().size());
-        return filmService.findFilms();
+        List<Film> films = filmService.findFilms();
+        log.debug("Получен список фильмов, количество = {}", films.size());
+        return films;
     }
 
     @GetMapping("/films/{filmId}")
     // получение пользователя по id
     public Film findFilmById(@PathVariable long filmId) {
         Film film = filmService.findFilmById(filmId);
-        log.debug("Получен фильм с id = : {}", filmId);
+        log.debug("Получен фильм с id = {}", filmId);
         return film;
     }
 
@@ -74,9 +75,8 @@ public class FilmController {
         if (filmService.like(id, userId)) {
             log.debug("Пользователь id = {} лайкнул фильм id = {}", userId, id);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
@@ -85,9 +85,8 @@ public class FilmController {
         if (filmService.dislike(id, userId)) {
             log.debug("Пользователь id = {} удалил лайк с фильма id = {}", userId, id);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @GetMapping("/films/popular")
@@ -96,39 +95,45 @@ public class FilmController {
     public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") String count) {
         int countInt = Integer.parseInt(count);
         if (countInt < 0) {
-            throw new ValidationException("Параметр count не может быть отрицательным!");
+            String message = "Параметр count не может быть отрицательным!";
+            log.warn(message);
+            throw new ValidationException(message);
         }
-        log.debug("Получен список из первых {} фильмов по количеству лайков", countInt);
-        return filmService.findPopularFilms(countInt);
+        List<Film> films = filmService.findPopularFilms(countInt);
+        log.debug("Получен список из первых {} фильмов по количеству лайков, " +
+                "количество = {}", countInt, films.size());
+        return films;
     }
 
     @GetMapping("/genres")
     // получение всех жанров
     public List<Genre> findGenres() {
-        log.debug("Получен список жанров, количество = : {}", filmService.findGenres().size());
-        return filmService.findGenres();
+        List<Genre> genres = filmService.findGenres();
+        log.debug("Получен список жанров, количество = {}", genres.size());
+        return genres;
     }
 
     @GetMapping("/genres/{id}")
     // получение жанра по id
     public Genre findGenreById(@PathVariable long id) {
         Genre genre = filmService.findGenreById(id);
-        log.debug("Получен жанр с id = : {}", id);
+        log.debug("Получен жанр с id = {}", id);
         return genre;
     }
 
     @GetMapping("/mpa")
     // получение всех рейтингов МПА
     public List<RatingMPA> findRatingMPAs() {
-        log.debug("Получен список рейтингов МПА, количество = : {}", filmService.findRatingMPAs().size());
-        return filmService.findRatingMPAs();
+        List<RatingMPA> ratingMPAs = filmService.findRatingMPAs();
+        log.debug("Получен список рейтингов МПА, количество = {}", ratingMPAs.size());
+        return ratingMPAs;
     }
 
     @GetMapping("/mpa/{id}")
     // получение рейтинга МПА по id
     public RatingMPA findRatingMPAById(@PathVariable long id) {
         RatingMPA ratingMPA = filmService.findRatingMPAById(id);
-        log.debug("Получен рейтинг МПА с id = : {}", id);
+        log.debug("Получен рейтинг МПА с id = {}", id);
         return ratingMPA;
     }
 
