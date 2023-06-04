@@ -28,7 +28,7 @@ class UserControllerTest {
     @BeforeEach
     public void beforeEach() {
         InMemoryUserStorage storage = new InMemoryUserStorage();
-        FriendStorage friendStorage = new InMemoryFriendStorage();
+        FriendStorage friendStorage = new InMemoryFriendStorage(storage);
         UserService service = new UserService(storage, friendStorage);
         controller = new UserController(service);
         storage.usersId = 0;

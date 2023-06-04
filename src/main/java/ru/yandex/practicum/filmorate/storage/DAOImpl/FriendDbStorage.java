@@ -33,7 +33,6 @@ public class FriendDbStorage implements FriendStorage {
         String sqlQuery = "select response_friend_id from friends " +
                 "where request_friend_id = ?";
         return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getLong("response_friend_id"), id);
-
     }
 
 }
