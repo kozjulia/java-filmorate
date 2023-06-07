@@ -90,7 +90,7 @@ public class FilmDbStorage implements FilmStorage {
 
     public boolean isFindFilmById(long filmId) {
         String sqlQuery = "select exists(select 1 from films where film_id = ?)";
-        if (jdbcTemplate.queryForObject(sqlQuery, new Object[]{filmId}, Boolean.class)) {
+        if (jdbcTemplate.queryForObject(sqlQuery, Boolean.class, filmId)) {
             return true;
         }
         log.warn("Фильм № {} не найден", filmId);

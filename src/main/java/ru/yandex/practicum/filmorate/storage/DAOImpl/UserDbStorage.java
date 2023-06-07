@@ -75,7 +75,7 @@ public class UserDbStorage implements UserStorage {
 
     public boolean isFindUserById(long userId) {
         String sqlQuery = "select exists(select 1 from users where user_id = ?)";
-        if (jdbcTemplate.queryForObject(sqlQuery, new Object[]{userId}, Boolean.class)) {
+        if (jdbcTemplate.queryForObject(sqlQuery, Boolean.class, userId)) {
             return true;
         }
         log.warn("Пользователь № {} не найден", userId);
