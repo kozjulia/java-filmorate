@@ -74,6 +74,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         return Optional.empty();
     }
 
+    public List<Film> findSortFilmsByDirector(long directorId, String sortBy) {
+        return Collections.EMPTY_LIST;
+    }
+
     private static Long getNextId() {
         return ++filmsId;
     }

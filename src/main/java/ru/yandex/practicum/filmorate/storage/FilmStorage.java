@@ -29,4 +29,6 @@ public interface FilmStorage {
 
     Optional<RatingMPA> findRatingMPAById(long ratingMPAId);
 
+    List<Film> findSortFilmsByDirector(long directorId, String sortBy);
+
 }

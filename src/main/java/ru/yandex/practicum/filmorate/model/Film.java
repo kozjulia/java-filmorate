@@ -30,5 +30,6 @@ public class Film {
     private Set<Long> likes = new HashSet<>(); // пользователи, лайкнувшие фильм
     private Set<Genre> genres = new HashSet<>(); // жанры
     private RatingMPA mpa; // рейтинг Ассоциации кинокомпаний (МРА)
+    private Set<Director> directors = new HashSet<>(); // режиссёры
 
 }
