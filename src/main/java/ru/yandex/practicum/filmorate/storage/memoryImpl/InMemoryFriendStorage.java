@@ -1,13 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.memoryImpl;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
