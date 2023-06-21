@@ -1,5 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -8,14 +12,9 @@ import ru.yandex.practicum.filmorate.model.RatingMPA;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.util.ValidatorControllers;
 
-import java.util.*;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.validation.annotation.Validated;
-
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping
@@ -101,16 +100,11 @@ public class FilmController {
     @GetMapping("/films/popular")
     //  возвращает список из первых count фильмов по количеству лайков.
     //  Если значение параметра count не задано, возвращает первые 10
-    public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") String count) {
-        int countInt = Integer.parseInt(count);
-        if (countInt < 0) {
-            String message = "Параметр count не может быть отрицательным!";
-            log.warn(message);
-            throw new ValidationException(message);
-        }
-        List<Film> films = filmService.findPopularFilms(countInt);
+    public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count,
+            @RequestParam Optional<Integer> genreId, @RequestParam Optional<Integer> year) {
+        List<Film> films = filmService.findPopularFilms(count, genreId, year);
         log.debug("Получен список из первых {} фильмов по количеству лайков, " +
-                "количество = {}", countInt, films.size());
+                "количество = {}", count, films.size());
         return films;
     }
 
