@@ -54,6 +54,14 @@ public class FilmController {
         log.debug("Удалён фильм: {}", film);
     }
 
+    @DeleteMapping("/films/{filmId}")
+    @Validated
+    // удаление фильма по id
+    public void deleteFilmById(@Valid @PathVariable long filmId) {
+        filmService.deleteFilmById(filmId);
+        log.debug("Удалён фильм c id: {}", filmId);
+    }
+
     @GetMapping("/films")
     // получение всех фильмов
     public List<Film> findFilms() {

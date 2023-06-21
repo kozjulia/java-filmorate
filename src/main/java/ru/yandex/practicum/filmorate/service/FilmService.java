@@ -51,6 +51,13 @@ public class FilmService {
         return filmStorage.delete(film);
     }
 
+    public boolean deleteFilmById(long filmId) {
+        if (!filmStorage.isFindFilmById(filmId)) {
+            return false;
+        }
+        return filmStorage.deleteFilmById(filmId);
+    }
+
     public List<Film> findFilms() {
         return filmStorage.findFilms().stream()
                 .peek(film -> film.setLikes(new HashSet<>(likeStorage.findLikes(film))))

@@ -39,6 +39,14 @@ public class InMemoryFilmStorage implements FilmStorage {
         return false;
     }
 
+    public boolean deleteFilmById(long filmId) {
+        if (films.containsKey(filmId)) {
+            films.remove(filmId);
+            return true;
+        }
+        return false;
+    }
+
     public List<Film> findFilms() {
         return new ArrayList<>(films.values());
     }
