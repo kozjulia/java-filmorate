@@ -18,6 +18,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,9 +94,17 @@ public class FilmService {
         return true;
     }
 
-    public List<Film> findPopularFilms(int count) {
-        return findFilms().stream()
-                .sorted(this::compare)
+    public List<Film> findPopularFilms(int count, Optional<Integer> genreId, Optional<Integer> year) {
+        List<Film> result = findFilms().stream().sorted(this::compare).collect(Collectors.toList());
+        if (year.isPresent()) {
+            result = result.stream().filter(f -> f.getReleaseDate().getYear() == year.get())
+                    .collect(Collectors.toList());
+        }
+        if (genreId.isPresent()) {
+            result = result.stream().filter(f -> f.getGenres().contains(findGenreById(genreId.get()))).collect(
+                    Collectors.toList());
+        }
+        return result.stream()
                 .limit(count)
                 .collect(Collectors.toList());
     }

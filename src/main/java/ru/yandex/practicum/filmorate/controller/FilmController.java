@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.util.ValidatorControllers;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping
@@ -99,16 +100,11 @@ public class FilmController {
     @GetMapping("/films/popular")
     //  возвращает список из первых count фильмов по количеству лайков.
     //  Если значение параметра count не задано, возвращает первые 10
-    public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") String count) {
-        int countInt = Integer.parseInt(count);
-        if (countInt < 0) {
-            String message = "Параметр count не может быть отрицательным!";
-            log.warn(message);
-            throw new ValidationException(message);
-        }
-        List<Film> films = filmService.findPopularFilms(countInt);
+    public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count,
+            @RequestParam Optional<Integer> genreId, @RequestParam Optional<Integer> year) {
+        List<Film> films = filmService.findPopularFilms(count, genreId, year);
         log.debug("Получен список из первых {} фильмов по количеству лайков, " +
-                "количество = {}", countInt, films.size());
+                "количество = {}", count, films.size());
         return films;
     }
 
