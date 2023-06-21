@@ -50,6 +50,14 @@ public class UserController {
         log.debug("Удалён пользователь: {}", user);
     }
 
+    @DeleteMapping("/{userId}")
+    @Validated
+    // удаление пользователя по id
+    public void deleteUserById(@Valid @PathVariable long userId) {
+        userService.deleteUserById(userId);
+        log.debug("Удалён пользователь c id: {}", userId);
+    }
+
     @GetMapping
     // получение списка всех пользователей
     public List<User> findUsers() {

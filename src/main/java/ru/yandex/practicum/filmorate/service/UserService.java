@@ -34,6 +34,13 @@ public class UserService {
         return userStorage.update(user).get();
     }
 
+    public boolean deleteUserById(long userId) {
+        if (!userStorage.isFindUserById(userId)) {
+            return false;
+        }
+        return userStorage.deleteUserById(userId);
+    }
+
     public boolean delete(User user) {
         if (!userStorage.isFindUserById(user.getId())) {
             return false;
