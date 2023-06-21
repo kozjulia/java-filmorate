@@ -59,26 +59,38 @@ public class ReviewController {
     }
 
     @PutMapping("/{reviewId}/like/{userId}")
-    public void addLike(@PathVariable Long reviewId, @PathVariable Long userId) {
-        reviewService.addLike(reviewId, userId);
-        log.debug("Пользователь id = {} лайкнул отзыв id = {}", userId, reviewId);
+    public boolean addLike(@PathVariable Long reviewId, @PathVariable Long userId) {
+        if (reviewService.increaseUseful(reviewId, userId)) {
+            log.debug("Пользователь id = {} лайкнул отзыв id = {}", userId, reviewId);
+            return true;
+        }
+        return false;
     }
 
     @PutMapping("/{reviewId}/dislike/{userId}")
-    public void addDislike(@PathVariable Long reviewId, @PathVariable Long userId) {
-        reviewService.addDislike(reviewId, userId);
-        log.debug("Пользователь id = {} дизлайкнул отзыв id = {}", userId, reviewId);
+    public boolean addDislike(@PathVariable Long reviewId, @PathVariable Long userId) {
+        if (reviewService.decreaseUseful(reviewId, userId)) {
+            log.debug("Пользователь id = {} дизлайкнул отзыв id = {}", userId, reviewId);
+            return true;
+        }
+        return false;
     }
 
     @DeleteMapping("/{reviewId}/like/{userId}")
-    public void deleteLike(@PathVariable Long reviewId, @PathVariable Long userId) {
-        reviewService.deleteLike(reviewId, userId);
-        log.debug("Пользователь id = {} удалил лайк на отзыв id = {}", userId, reviewId);
+    public boolean deleteLike(@PathVariable Long reviewId, @PathVariable Long userId) {
+        if (reviewService.decreaseUseful(reviewId, userId)) {
+            log.debug("Пользователь id = {} удалил лайк на отзыв id = {}", userId, reviewId);
+            return true;
+        }
+        return false;
     }
 
     @DeleteMapping("/{reviewId}/dislike/{userId}")
-    public void deleteDislike(@PathVariable Long reviewId, @PathVariable Long userId) {
-        reviewService.deleteDislike(reviewId, userId);
-        log.debug("Пользователь id = {} удалил дизлайк на отзыв id = {}", userId, reviewId);
+    public boolean deleteDislike(@PathVariable Long reviewId, @PathVariable Long userId) {
+        if (reviewService.increaseUseful(reviewId, userId)) {
+            log.debug("Пользователь id = {} удалил дизлайк на отзыв id = {}", userId, reviewId);
+            return true;
+        }
+        return false;
     }
 }

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
@@ -23,50 +22,50 @@ public class ReviewService {
     private final UserStorage userStorage;
 
     public Review create(Review review) {
-        userStorage.isFindUserById(review.getUserId());
-        filmStorage.isFindFilmById(review.getFilmId());
-        return reviewStorage.create(review);
+        if (!filmStorage.isFindFilmById(review.getFilmId()) || !userStorage.isFindUserById(review.getUserId())) {
+            return null;
+        }
+        return reviewStorage.create(review).get();
     }
 
     public Review update(Review review) {
-        reviewStorage.findReviewById(review.getReviewId());
-        return reviewStorage.update(review);
+        if (!reviewStorage.isFindReviewById(review.getReviewId())) {
+            return null;
+        }
+        return reviewStorage.update(review).get();
     }
 
-    public void delete(Long reviewId) {
-        reviewStorage.findReviewById(reviewId);
-        reviewStorage.delete(reviewId);
+    public boolean delete(Long reviewId) {
+        if (!reviewStorage.isFindReviewById(reviewId)) {
+            return false;
+        }
+        return reviewStorage.delete(reviewId);
     }
 
     public Review findReviewById(Long reviewId) {
-        return reviewStorage.findReviewById(reviewId);
+        return reviewStorage.findReviewById(reviewId).get();
     }
 
     public List<Review> findReviews(Long filmId, Integer count) {
+        if (filmId != null && !filmStorage.isFindFilmById(filmId)) {
+            return null;
+        }
         return reviewStorage.findReviews(filmId, count);
     }
 
-    public void addLike(Long reviewId, Long userId) {
-        reviewStorage.findReviewById(reviewId);
-        userStorage.isFindUserById(userId);
+    public boolean increaseUseful(Long reviewId, Long userId) {
+        if (!reviewStorage.isFindReviewById(reviewId) || !userStorage.isFindUserById(userId)) {
+            return false;
+        }
         reviewStorage.increaseUseful(reviewId);
+        return true;
     }
 
-    public void addDislike(Long reviewId, Long userId) {
-        reviewStorage.findReviewById(reviewId);
-        userStorage.isFindUserById(userId);
+    public boolean decreaseUseful(Long reviewId, Long userId) {
+        if (!reviewStorage.isFindReviewById(reviewId) || !userStorage.isFindUserById(userId)) {
+            return false;
+        }
         reviewStorage.decreaseUseful(reviewId);
-    }
-
-    public void deleteLike(Long reviewId, Long userId) {
-        reviewStorage.findReviewById(reviewId);
-        userStorage.isFindUserById(userId);
-        reviewStorage.decreaseUseful(reviewId);
-    }
-
-    public void deleteDislike(Long reviewId, Long userId) {
-        reviewStorage.findReviewById(reviewId);
-        userStorage.isFindUserById(userId);
-        reviewStorage.increaseUseful(reviewId);
+        return true;
     }
 }

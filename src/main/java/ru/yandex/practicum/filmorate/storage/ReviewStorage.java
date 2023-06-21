@@ -3,19 +3,21 @@ package ru.yandex.practicum.filmorate.storage;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewStorage {
-    Review create(Review review);
+    Optional<Review> create(Review review);
 
-    Review update(Review review);
+    Optional<Review> update(Review review);
 
-    void delete(Long reviewId);
+    boolean delete(Long reviewId);
 
-    Review findReviewById(Long reviewId);
+    Optional<Review> findReviewById(Long reviewId);
+    boolean isFindReviewById(Long reviewId);
 
     List<Review> findReviews(Long filmId, Integer count);
 
-    void increaseUseful(Long reviewId);
+    boolean increaseUseful(Long reviewId);
 
-    void decreaseUseful(Long reviewId);
+    boolean decreaseUseful(Long reviewId);
 }

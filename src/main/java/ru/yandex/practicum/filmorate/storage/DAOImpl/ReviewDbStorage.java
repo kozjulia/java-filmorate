@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Primary
@@ -25,7 +26,7 @@ import java.util.List;
 public class ReviewDbStorage implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
     @Override
-    public Review create(Review review) {
+    public Optional<Review> create(Review review) {
         String sqlQuery = "insert into reviews(review_content, is_positive, user_id, film_id, useful) " +
                 " values (?, ?, ?, ?, ?);";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -41,11 +42,11 @@ public class ReviewDbStorage implements ReviewStorage {
         }, keyHolder);
         review.setReviewId((Long) keyHolder.getKey());
         review.setUseful(0);
-        return review;
+        return Optional.of(review);
     }
 
     @Override
-    public Review update(Review review) {
+    public Optional<Review> update(Review review) {
         String sqlQuery = "update reviews set review_content = ?, is_positive = ? where review_id = ?;";
         jdbcTemplate.update(sqlQuery, review.getContent(), review.getIsPositive(), review.getReviewId());
 
@@ -53,21 +54,31 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public void delete(Long reviewId) {
+    public boolean delete(Long reviewId) {
         String sqlQuery = "delete from reviews where review_id = ?;";
-        jdbcTemplate.update(sqlQuery, reviewId);
+        return jdbcTemplate.update(sqlQuery, reviewId) > 0;
     }
 
     @Override
-    public Review findReviewById(Long reviewId) {
+    public Optional<Review> findReviewById(Long reviewId) {
         String sqlQuery = "select * from reviews where review_id = ?;";
 
         try {
-            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToReview, reviewId);
+            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::mapRowToReview, reviewId));
         } catch (EmptyResultDataAccessException e) {
             log.warn("Отзыв № {} не найден", reviewId);
             throw new ReviewNotFoundException(String.format("Отзыв № %d не найден", reviewId));
         }
+    }
+
+    @Override
+    public boolean isFindReviewById(Long reviewId) {
+        String sqlQuery = "select exists(select 1 from reviews where review_id = ?)";
+        if (jdbcTemplate.queryForObject(sqlQuery, Boolean.class, reviewId)) {
+            return true;
+        }
+        log.warn("Отзыв № {} не найден", reviewId);
+        throw new ReviewNotFoundException(String.format("Отзыв № %d не найден", reviewId));
     }
 
     @Override
@@ -82,15 +93,17 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public void increaseUseful(Long reviewId) {
+    public boolean increaseUseful(Long reviewId) {
         String sqlQuery = "update reviews set useful = useful + 1 where review_id = ?;";
         jdbcTemplate.update(sqlQuery, reviewId);
+        return true;
     }
 
     @Override
-    public void decreaseUseful(Long reviewId) {
+    public boolean decreaseUseful(Long reviewId) {
         String sqlQuery = "update reviews set useful = useful - 1 where review_id = ?;";
         jdbcTemplate.update(sqlQuery, reviewId);
+        return true;
     }
 
     private Review mapRowToReview(ResultSet rs, int rowNum) throws SQLException {
