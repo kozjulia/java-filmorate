@@ -13,6 +13,7 @@ public interface ReviewStorage {
     boolean delete(Long reviewId);
 
     Optional<Review> findReviewById(Long reviewId);
+
     boolean isFindReviewById(Long reviewId);
 
     List<Review> findReviews(Long filmId, Integer count);

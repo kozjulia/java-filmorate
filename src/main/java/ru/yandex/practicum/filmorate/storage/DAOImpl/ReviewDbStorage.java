@@ -25,6 +25,7 @@ import java.util.Optional;
 @Slf4j
 public class ReviewDbStorage implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     public Optional<Review> create(Review review) {
         String sqlQuery = "insert into reviews(review_content, is_positive, user_id, film_id, useful) " +

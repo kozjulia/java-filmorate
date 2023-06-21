@@ -1,13 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.memoryImpl;
 
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
-
-import java.util.*;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
+
+import java.util.*;
 
 @Component
 @Slf4j
