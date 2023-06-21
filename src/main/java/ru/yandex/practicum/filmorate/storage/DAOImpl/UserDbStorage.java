@@ -58,6 +58,11 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.update(sqlQuery, user.getId()) > 0;
     }
 
+    public boolean deleteUserById(long userId) {
+        String sqlQuery = "delete from users where user_id = ?";
+        return jdbcTemplate.update(sqlQuery, userId) > 0;
+    }
+
     public List<User> findUsers() {
         String sqlQuery = "select * from users";
         return jdbcTemplate.query(sqlQuery, this::makeUser);

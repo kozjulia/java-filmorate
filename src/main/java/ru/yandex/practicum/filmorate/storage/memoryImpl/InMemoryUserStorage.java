@@ -36,6 +36,14 @@ public class InMemoryUserStorage implements UserStorage {
         return false;
     }
 
+    public boolean deleteUserById(long userId) {
+        if (users.containsKey(userId)) {
+            users.remove(userId);
+            return true;
+        }
+        return false;
+    }
+
     public List<User> findUsers() {
         return new ArrayList<>(users.values());
     }

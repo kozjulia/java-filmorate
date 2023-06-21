@@ -75,6 +75,11 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.update(sqlQuery, film.getId()) > 0;
     }
 
+    public boolean deleteFilmById(long filmId) {
+        String sqlQuery = "delete from films where film_id = ?";
+        return jdbcTemplate.update(sqlQuery, filmId) > 0;
+    }
+
     public List<Film> findFilms() {
         String sqlQuery = "select * from films";
         return jdbcTemplate.query(sqlQuery, this::makeFilm);
