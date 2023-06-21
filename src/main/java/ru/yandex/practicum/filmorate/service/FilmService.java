@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.service;
 
+import ru.yandex.practicum.filmorate.exception.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.exception.RatingMPANotFoundException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.RatingMPA;
@@ -9,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -113,6 +116,43 @@ public class FilmService {
                     log.warn("Рейтинг МПА № {} не найден", ratingMPAId);
                     throw new RatingMPANotFoundException(String.format("Рейтинг МПА № %d не найден", ratingMPAId));
                 });
+    }
+
+    public List<Director> findDirectors() {
+        return filmStorage.findDirectors();
+    }
+
+    public Director findDirectorById(long directorId) {
+        return filmStorage.findDirectorById(directorId)
+                .orElseThrow(() -> {
+                    log.warn("Режиссёр № {} не найден", directorId);
+                    throw new DirectorNotFoundException(String.format("Режиссёр № %d не найден", directorId));
+                });
+    }
+
+    public Director createDirector(Director director) {
+        return filmStorage.createDirector(director).get();
+    }
+
+    public Director updateDirector(Director director) {
+        if (!filmStorage.isFindDirectorById(director.getId())) {
+            return null;
+        }
+        return filmStorage.updateDirector(director).get();
+    }
+
+    public boolean deleteDirectorById(Long directorId) {
+        if (!filmStorage.isFindDirectorById(directorId)) {
+            return false;
+        }
+        return filmStorage.deleteDirectorById(directorId);
+    }
+
+    public List<Film> findSortFilmsByDirector(long directorId, String sortBy) {
+        if (!filmStorage.isFindDirectorById(directorId)) {
+            return Collections.EMPTY_LIST;
+        }
+        return filmStorage.findSortFilmsByDirector(directorId, sortBy);
     }
 
     private int compare(Film film1, Film film2) {

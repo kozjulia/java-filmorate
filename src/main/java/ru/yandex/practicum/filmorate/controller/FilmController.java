@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.RatingMPA;
@@ -135,6 +136,64 @@ public class FilmController {
         RatingMPA ratingMPA = filmService.findRatingMPAById(id);
         log.debug("Получен рейтинг МПА с id = {}", id);
         return ratingMPA;
+    }
+
+    @GetMapping("/directors")
+    // получение всех режиссёров
+    public List<Director> findDirectors() {
+        List<Director> directors = filmService.findDirectors();
+        log.debug("Получен список режиссёров, количество = {}", directors.size());
+        return directors;
+    }
+
+    @GetMapping("/directors/{id}")
+    // получение режиссёра по id
+    public Director findDirectorById(@PathVariable long id) {
+        Director director = filmService.findDirectorById(id);
+        log.debug("Получен режиссёр с id = {}", id);
+        return director;
+    }
+
+    @PostMapping("/directors")
+    // добавление режиссёра
+    public Director createDirector(@RequestBody Director director) {
+        director = ValidatorControllers.validateDirector(director);
+        Director newDirector = filmService.createDirector(director);
+        log.debug("Добавлен новый режиссёр: {}", newDirector);
+        return newDirector;
+    }
+
+    @PutMapping("/directors")
+    // обновление режиссёра
+    public Director update(@RequestBody Director director) {
+        director = ValidatorControllers.validateDirector(director);
+        Director newDirector = filmService.updateDirector(director);
+        log.debug("Обновлен режиссёр: {}", newDirector);
+        return newDirector;
+    }
+
+    @DeleteMapping("/directors/{id}")
+    // удаление режиссёра
+    public boolean deleteDirector(@PathVariable long id) {
+        if (filmService.deleteDirectorById(id)) {
+            log.debug("Удалён режиссёр с id = {}", id);
+            return true;
+        }
+        return false;
+    }
+
+    @GetMapping("/films/director/{directorId}")
+    //  Возвращает список фильмов режиссёра, отсортированных по количеству лайков или году выпуска
+    public List<Film> findSortFilmsByDirector(@PathVariable long directorId, @RequestParam String sortBy) {
+        if (!sortBy.equals("year") && !sortBy.equals("likes")) {
+            String message = "Параметр sortBy может быть только year или likes!";
+            log.warn(message);
+            throw new ValidationException(message);
+        }
+        List<Film> films = filmService.findSortFilmsByDirector(directorId, sortBy);
+        log.debug("Получен отсортированный список фильмов по {}, " +
+                "количество = {}", sortBy, films.size());
+        return films;
     }
 
 }
