@@ -115,7 +115,7 @@ public class UserController {
     // новостная лента
     public List<Event> getEvent(@PathVariable int id) {
         List<Event> feeds = userService.getUserEvent(id);
-        log.debug("Получена новостная лнета пользователя - {}, количество записей {}", userService.findUserById(id).getName(), feeds.size());
+        log.debug("Получена новостная лента пользователя - {}, количество записей {}", userService.findUserById(id).getName(), feeds.size());
         return feeds;
     }
 }

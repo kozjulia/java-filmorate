@@ -3,17 +3,18 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Event {
-    long timestamp;
-    long userId;
-    String eventType;
-    String operation;
-    long eventId;
-    long entityId;
+    private long timestamp;
+    private long userId;
+    private String eventType;
+    private String operation;
+    @NonNull
+    private long eventId;
+    @NonNull
+    private long entityId;
 }
