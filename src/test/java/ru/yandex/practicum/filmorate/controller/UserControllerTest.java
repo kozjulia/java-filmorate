@@ -8,9 +8,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
-import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryFriendStorage;
-import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryLikeStorage;
 import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryUserStorage;
 
 import java.time.LocalDate;
