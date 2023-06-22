@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.RatingMPA;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -32,6 +33,8 @@ public class FilmService {
     private final UserStorage userStorage;
     @Qualifier("likeDbStorage")
     private final LikeStorage likeStorage;
+    @Qualifier("eventDbStorage")
+    private final EventStorage eventStorage;
 
     public Film create(Film film) {
         return filmStorage.create(film).get();
@@ -79,6 +82,7 @@ public class FilmService {
         film.getLikes().add(userId);
         likeStorage.dislike(film);
         likeStorage.like(film);
+        eventStorage.createEvent(userId, "LIKE", "ADD", id);
         return true;
     }
 
@@ -91,6 +95,7 @@ public class FilmService {
         film.getLikes().remove(userId);
         likeStorage.dislike(film);
         likeStorage.like(film);
+        eventStorage.createEvent(userId, "LIKE", "REMOVE", id);
         return true;
     }
 

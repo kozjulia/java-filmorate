@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
 
-import java.util.List;
+import java.util.*;
 
 @Repository
 @Primary
@@ -37,4 +37,16 @@ public class LikeDbStorage implements LikeStorage {
         return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getLong("user_id"), film.getId());
     }
 
+    public Map<Long, Set<Long>> findAllUsersWithLikes() {
+        Map<Long, Set<Long>> usersWithLikes = new HashMap<>();
+        String sqlQueryUsersId = "select user_id from likes group by user_id;";
+        List<Long> users = jdbcTemplate.query(sqlQueryUsersId, (rs, rowNum) -> rs.getLong("user_id"));
+        for (Long user : users) {
+            String sqlQueryFilmsId = "select film_id from likes where user_id = ?;";
+            List<Long> likes = jdbcTemplate.query(sqlQueryFilmsId,
+                    (rs, rowNum) -> rs.getLong("film_id"), user);
+            usersWithLikes.put(user, new HashSet<>(likes));
+        }
+        return usersWithLikes;
+    }
 }
