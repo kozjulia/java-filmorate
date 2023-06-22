@@ -15,5 +15,5 @@ public interface LikeStorage {
     List<Long> findLikes(Film film);
 
     Map<Long, Set<Long>> findAllUsersWithLikes();
-    
+
 }
