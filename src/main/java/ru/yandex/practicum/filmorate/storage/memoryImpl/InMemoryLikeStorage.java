@@ -7,6 +7,8 @@ import ru.yandex.practicum.filmorate.storage.LikeStorage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -24,6 +26,11 @@ public class InMemoryLikeStorage implements LikeStorage {
 
     public List<Long> findLikes(Film film) {
         return new ArrayList<>(filmStorage.findFilmById(film.getId()).get().getLikes());
+    }
+
+    @Override
+    public Map<Long, Set<Long>> findAllUsersWithLikes() {
+        return null;
     }
 
 }
