@@ -46,4 +46,6 @@ public interface FilmStorage {
 
     List<Film> findSortFilmsByDirector(long directorId, String sortBy);
 
+    List<Film> findSortFilmsBySubstring(String query, boolean isDirector, boolean isTitle);
+
 }

@@ -175,6 +175,11 @@ public class FilmService {
         return filmStorage.findSortFilmsByDirector(directorId, sortBy);
     }
 
+
+    public List<Film> findSortFilmsBySubstring(String query, boolean isDirector, boolean isTitle) {
+        return filmStorage.findSortFilmsBySubstring(query, isDirector, isTitle);
+    }
+
     private int compare(Film film1, Film film2) {
         return film2.getLikes().size() - film1.getLikes().size();
     }

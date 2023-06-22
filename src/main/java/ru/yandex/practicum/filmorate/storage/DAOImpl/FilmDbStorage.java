@@ -203,6 +203,28 @@ public class FilmDbStorage implements FilmStorage {
         return Collections.EMPTY_LIST;
     }
 
+    public List<Film> findSortFilmsBySubstring(String query, boolean isDirector, boolean isTitle) {
+        String where = "";
+        if (isDirector && isTitle) {
+            where = "WHERE  LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') OR " +
+                    "LOWER(d.DIRECTOR_NAME) LIKE LOWER('%" + query + "%') ";
+        } else if (isDirector) {
+            where = "WHERE LOWER(d.DIRECTOR_NAME) LIKE LOWER('%" + query + "%') ";
+        } else if (isTitle) {
+            where = "WHERE  LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') ";
+        }
+
+        String sqlQuery = "SELECT  f.*, COUNT(l.user_id) as likes " +
+                "FROM films as f " +
+                "LEFT OUTER JOIN film_director as fd ON fd.film_id = f.film_id " +
+                "LEFT OUTER  JOIN DIRECTORS as d ON d.director_id = fd.DIRECTOR_ID " +
+                "LEFT OUTER  JOIN likes as l ON l.film_id = f.film_id " +
+                where +
+                "GROUP BY f.film_id " +
+                "ORDER BY likes DESC ";
+        return jdbcTemplate.query(sqlQuery, this::makeFilm);
+    }
+
     private void createGenre(Long filmId, Genre genre) {
         String sqlQuery = "insert into film_genre(film_id, genre_id) " +
                 " values (?, ?)";
