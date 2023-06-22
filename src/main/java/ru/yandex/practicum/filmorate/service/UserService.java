@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -21,6 +23,8 @@ public class UserService {
     private final UserStorage userStorage;
     @Qualifier("friendDbStorage")
     private final FriendStorage friendStorage;
+    @Qualifier("eventDbStorage")
+    private final EventStorage eventStorage;
 
     public User create(User user) {
         return userStorage.create(user).get();
@@ -62,6 +66,7 @@ public class UserService {
         User friendRequest = userStorage.findUserById(id).get();
         User friendResponse = userStorage.findUserById(friendId).get();
         friendStorage.addInFriends(friendRequest, friendResponse);
+        eventStorage.createEvent(id, "FRIEND", "ADD", friendId);
         return true;
     }
 
@@ -72,6 +77,7 @@ public class UserService {
         User friendRequest = userStorage.findUserById(id).get();
         User friendResponse = userStorage.findUserById(friendId).get();
         friendStorage.deleteFromFriends(friendRequest, friendResponse);
+        eventStorage.createEvent(id, "FRIEND", "REMOVE", friendId);
         return true;
     }
 
@@ -93,4 +99,8 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public List<Event> getUserFeed(Integer userId) {
+        userStorage.findUserById(userId).get();
+        return userStorage.getUserEvent(userId);
+    }
 }

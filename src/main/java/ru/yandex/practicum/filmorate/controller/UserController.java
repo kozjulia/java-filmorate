@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.util.ValidatorControllers;
+import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.util.ValidatorControllers;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -110,4 +115,9 @@ public class UserController {
         return users;
     }
 
+    @GetMapping("/{id}/feed")
+    public List<Event> getFeed(@PathVariable int id) {
+        List<Event> feeds = userService.getUserFeed(id);
+        return feeds;
+    }
 }

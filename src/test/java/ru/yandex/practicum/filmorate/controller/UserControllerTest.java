@@ -28,7 +28,7 @@ class UserControllerTest {
     public void beforeEach() {
         InMemoryUserStorage storage = new InMemoryUserStorage();
         FriendStorage friendStorage = new InMemoryFriendStorage(storage);
-        UserService service = new UserService(storage, friendStorage);
+        UserService service = new UserService(storage, friendStorage, null);
         controller = new UserController(service);
         InMemoryUserStorage.usersId = 0;
         user1 = new User("email1@mail.ru", "user1", LocalDate.of(1980, 01, 01));
