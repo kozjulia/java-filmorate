@@ -31,7 +31,7 @@ class FilmControllerTest {
         InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
         UserStorage userStorage = new InMemoryUserStorage();
         LikeStorage likeStorage = new InMemoryLikeStorage(filmStorage);
-        FilmService service = new FilmService(filmStorage, userStorage, likeStorage);
+        FilmService service = new FilmService(filmStorage, userStorage, likeStorage, null);
         controller = new FilmController(service);
         InMemoryFilmStorage.filmsId = 0;
         film1 = new Film("film 1", "FIlm 1 description",

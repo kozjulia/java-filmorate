@@ -10,15 +10,15 @@ import javax.validation.constraints.Size;
 @Data
 @Builder
 public class Review {
-    Long reviewId;
+    private Long reviewId;
     @NotBlank(message = "Описание не может быть пустым.")
     @Size(max = 1000, message = "Описание не может быть больше 1000 символов.")
-    String content;
+    private String content;
     @NonNull
-    Boolean isPositive;
+    private Boolean isPositive;
     @NonNull
-    Long userId;
+    private Long userId;
     @NonNull
-    Long filmId;
-    Integer useful;
+    private Long filmId;
+    private Integer useful;
 }
