@@ -46,7 +46,7 @@ public class ReviewController {
 
     @GetMapping
     public List<Review> findReviews(@RequestParam(required = false) Long filmId,
-            @RequestParam(defaultValue = "10", required = false) Integer count) {
+                                    @RequestParam(defaultValue = "10", required = false) Integer count) {
         if (count < 0) {
             String message = "Параметр count не может быть отрицательным!";
             log.warn(message);

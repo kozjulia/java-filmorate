@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -86,6 +87,12 @@ public class UserDbStorage implements UserStorage {
         throw new UserNotFoundException(String.format("Пользователь № %d не найден", userId));
     }
 
+    @Override
+    public List<Event> getUserEvent(Integer id) {
+        String sqlQuery = "SELECT * FROM feeds WHERE userId = ?";
+        return jdbcTemplate.query(sqlQuery, this::makeEvent, id);
+    }
+
     private User makeUser(ResultSet rs, int rowNum) throws SQLException {
         User user = new User(rs.getString("email"), rs.getString("login"),
                 rs.getDate("birthday").toLocalDate());
@@ -94,4 +101,14 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+    private Event makeEvent(ResultSet rs, int rowNum) throws SQLException {
+        return Event.builder()
+                .timestamp(rs.getLong("timestamp"))
+                .userId(rs.getLong("userId"))
+                .eventType(rs.getString("eventType"))
+                .operation(rs.getString("operation"))
+                .eventId(rs.getLong("eventId"))
+                .entityId(rs.getLong("entityId"))
+                .build();
+    }
 }
