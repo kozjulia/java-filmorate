@@ -46,8 +46,7 @@ public class ReviewService {
         if (!reviewStorage.isFindReviewById(reviewId)) {
             return false;
         }
-        eventStorage.createEvent(findReviewById(reviewId).getUserId(), "REVIEW", "REMOVE"
-                , findReviewById(reviewId).getReviewId());
+        eventStorage.createEvent(findReviewById(reviewId).getUserId(), "REVIEW", "REMOVE", findReviewById(reviewId).getReviewId());
         return reviewStorage.delete(reviewId);
     }
 
