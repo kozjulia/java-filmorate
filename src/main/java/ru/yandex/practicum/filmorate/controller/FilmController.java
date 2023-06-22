@@ -101,7 +101,7 @@ public class FilmController {
     //  возвращает список из первых count фильмов по количеству лайков.
     //  Если значение параметра count не задано, возвращает первые 10
     public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count,
-            @RequestParam Optional<Integer> genreId, @RequestParam Optional<Integer> year) {
+                                       @RequestParam Optional<Integer> genreId, @RequestParam Optional<Integer> year) {
         List<Film> films = filmService.findPopularFilms(count, genreId, year);
         log.debug("Получен список из первых {} фильмов по количеству лайков, " +
                 "количество = {}", count, films.size());
@@ -195,6 +195,22 @@ public class FilmController {
         List<Film> films = filmService.findSortFilmsByDirector(directorId, sortBy);
         log.debug("Получен отсортированный список фильмов по {}, " +
                 "количество = {}", sortBy, films.size());
+        return films;
+    }
+
+    @GetMapping("/films/search")
+    // Возвращает список фильмов, отсортированных по популярности, который ищет по подстроке
+    public List<Film> findSortFilmsBySubstring(@RequestParam String query, @RequestParam String by) {
+        if (!by.contains("director") && !by.contains("title")) {
+            String message = "Параметр by должен содержать director или/и title!";
+            log.warn(message);
+            throw new ValidationException(message);
+        }
+        boolean isDirector = by.contains("director");
+        boolean isTitle = by.contains("title");
+        List<Film> films = filmService.findSortFilmsBySubstring(query, isDirector, isTitle);
+        log.debug("Получен отсортированный список фильмов, который ищет подстроку \"{}\" в {}, " +
+                "количество = {}", query, by, films.size());
         return films;
     }
 

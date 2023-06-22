@@ -110,6 +110,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         return Collections.EMPTY_LIST;
     }
 
+    public List<Film> findSortFilmsBySubstring(String query, boolean isDirector, boolean isTitle) {
+        return Collections.EMPTY_LIST;
+    }
+
     private static Long getNextId() {
         return ++filmsId;
     }
