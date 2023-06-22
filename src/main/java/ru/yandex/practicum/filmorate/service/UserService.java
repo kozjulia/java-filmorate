@@ -99,7 +99,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public List<Film> getRecommendations (Long id) {
+    public List<Film> getRecommendations(Long id) {
         // проверка id пользователя
         if (!userStorage.isFindUserById(id)) {
             return null;

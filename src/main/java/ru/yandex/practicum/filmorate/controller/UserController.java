@@ -112,7 +112,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/recommendations")
-    public List<Film> getRecommendations (@PathVariable Long id) {
+    public List<Film> getRecommendations(@PathVariable Long id) {
         List<Film> recommendedFilms = userService.getRecommendations(id);
         log.debug("Получен список рекомендуемых фильмов для пользователя с id = {}, " +
                 "количество = {}", id, recommendedFilms.size());
