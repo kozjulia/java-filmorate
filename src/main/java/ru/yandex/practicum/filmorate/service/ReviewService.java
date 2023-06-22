@@ -37,9 +37,9 @@ public class ReviewService {
         if (!reviewStorage.isFindReviewById(review.getReviewId())) {
             return null;
         }
-        reviewStorage.update(review);
-        eventStorage.createEvent(review.getUserId(), "REVIEW", "UPDATE", review.getReviewId());
-        return review;
+        long reviewAuthorId = findReviewById(review.getReviewId()).getReviewId();
+        eventStorage.createEvent(reviewAuthorId, "REVIEW", "UPDATE", review.getReviewId());
+        return reviewStorage.update(review).get();
     }
 
     public boolean delete(Long reviewId) {

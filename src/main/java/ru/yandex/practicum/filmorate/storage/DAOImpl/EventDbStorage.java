@@ -12,14 +12,12 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class EventDbStorage implements EventStorage {
     private final JdbcTemplate jdbcTemplate;
-    private int eventId = 0;
 
     @Override
     public void createEvent(long userId, String eventType, String operation, long entityId) {
         long timestamp = Timestamp.from(Instant.now()).getTime();
-        eventId += 1;
-        String sqlQuery = "INSERT INTO feeds (userId, timestamp, eventType, operation, entityId, eventId) VALUES (?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sqlQuery, userId, timestamp, eventType, operation, entityId, eventId);
+        String sqlQuery = "INSERT INTO feeds (userId, timestamp, eventType, operation, entityId) VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sqlQuery, userId, timestamp, eventType, operation, entityId);
 
     }
 }

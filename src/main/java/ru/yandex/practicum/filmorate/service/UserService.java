@@ -99,7 +99,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public List<Event> getUserFeed(Integer userId) {
+    public List<Event> getUserEvent(Integer userId) {
         userStorage.findUserById(userId).get();
         return userStorage.getUserEvent(userId);
     }

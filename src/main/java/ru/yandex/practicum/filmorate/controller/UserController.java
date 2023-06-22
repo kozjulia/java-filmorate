@@ -4,10 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.util.ValidatorControllers;
-import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -116,8 +112,10 @@ public class UserController {
     }
 
     @GetMapping("/{id}/feed")
-    public List<Event> getFeed(@PathVariable int id) {
-        List<Event> feeds = userService.getUserFeed(id);
+    // новостная лента
+    public List<Event> getEvent(@PathVariable int id) {
+        List<Event> feeds = userService.getUserEvent(id);
+        log.debug("Получена новостная лнета пользователя - {}, количество записей {}", userService.findUserById(id).getName(), feeds.size());
         return feeds;
     }
 }
