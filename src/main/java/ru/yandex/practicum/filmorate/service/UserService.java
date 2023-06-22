@@ -104,7 +104,6 @@ public class UserService {
         if (!userStorage.isFindUserById(id)) {
             return null;
         }
-        // Map<userId, Set<filmId>>
         Map<Long, Set<Long>> usersWithLikes = likeStorage.findAllUsersWithLikes();
         // Set с filmId для пользователя id
         Set<Long> userLikeFilms = usersWithLikes.get(id);
