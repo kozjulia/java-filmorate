@@ -233,7 +233,7 @@ public class FilmDbStorage implements FilmStorage {
                 "AND f.film_id IN (SELECT l2.film_id FROM likes l2 WHERE l2.user_id = ?) " +
                 "GROUP BY f.film_id " +
                 "ORDER BY likes DESC";
-        return jdbcTemplate.query(sqlQuery, this::makeFilm);
+        return jdbcTemplate.query(sqlQuery, this::makeFilm, userId, friendId);
     }
 
     private void createGenre(Long filmId, Genre genre) {
