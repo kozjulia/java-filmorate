@@ -184,4 +184,7 @@ public class FilmService {
         return film2.getLikes().size() - film1.getLikes().size();
     }
 
+    public List<Film> findCommonSortedFilms(long userId, long friendId) {
+        return filmStorage.findCommonSortedFilms(userId, friendId);
+    }
 }

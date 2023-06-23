@@ -214,4 +214,11 @@ public class FilmController {
         return films;
     }
 
+    @GetMapping("/films/common")
+    // Возвращает список общих фильмов, отсортированных по популярности.
+    public List<Film> findCommonSortedFilms(@RequestParam long userId, @RequestParam long friendId) {
+        List<Film> films = filmService.findCommonSortedFilms(userId, friendId);
+        log.debug("Получен список общих фильмов у пользователей {} и {}.", userId, friendId);
+        return films;
+    }
 }
