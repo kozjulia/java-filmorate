@@ -225,6 +225,17 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, this::makeFilm);
     }
 
+    public List<Film> findCommonSortedFilms(long userId, long friendId) {
+        String sqlQuery = "SELECT f.*, COUNT(l.user_id) as likes " +
+                "FROM films as f " +
+                "LEFT OUTER JOIN likes as l ON l.film_id = f.film_id " +
+                "WHERE f.film_id IN (SELECT l1.film_id FROM likes l1 WHERE l1.user_id = ?) " +
+                "AND f.film_id IN (SELECT l2.film_id FROM likes l2 WHERE l2.user_id = ?) " +
+                "GROUP BY f.film_id " +
+                "ORDER BY likes DESC";
+        return jdbcTemplate.query(sqlQuery, this::makeFilm);
+    }
+
     private void createGenre(Long filmId, Genre genre) {
         String sqlQuery = "insert into film_genre(film_id, genre_id) " +
                 " values (?, ?)";
@@ -306,5 +317,4 @@ public class FilmDbStorage implements FilmStorage {
     private Director makeDirector(ResultSet rs, int rowNum) throws SQLException {
         return new Director(rs.getLong("director_id"), rs.getString("director_name"));
     }
-
 }

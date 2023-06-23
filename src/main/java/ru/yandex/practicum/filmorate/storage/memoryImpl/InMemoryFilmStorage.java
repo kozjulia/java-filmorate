@@ -114,6 +114,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         return Collections.EMPTY_LIST;
     }
 
+    public List<Film> findCommonSortedFilms(long userId, long friendId) {
+        return Collections.EMPTY_LIST;
+    }
+
     private static Long getNextId() {
         return ++filmsId;
     }
