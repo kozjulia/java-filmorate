@@ -1,13 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.DAOImpl;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
@@ -23,6 +15,15 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
+
 @Repository
 @Primary
 @RequiredArgsConstructor
@@ -33,7 +34,7 @@ public class FilmDbStorage implements FilmStorage {
 
     public Optional<Film> create(Film film) {
         String sqlQuery = "insert into films(film_name, description, release_date, duration, rate, rating_mpa_id) " +
-                " values (?, ?, ?, ?, ?, ?)";
+                "values (?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -205,19 +206,21 @@ public class FilmDbStorage implements FilmStorage {
 
     public List<Film> findSortFilmsBySubstring(String query, boolean isDirector, boolean isTitle) {
         String where = "";
+        String joinDirector = "LEFT OUTER JOIN film_director as fd ON fd.film_id = f.film_id " +
+                "LEFT OUTER  JOIN DIRECTORS as d ON d.director_id = fd.DIRECTOR_ID ";
         if (isDirector && isTitle) {
             where = "WHERE  LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') OR " +
                     "LOWER(d.DIRECTOR_NAME) LIKE LOWER('%" + query + "%') ";
         } else if (isDirector) {
             where = "WHERE LOWER(d.DIRECTOR_NAME) LIKE LOWER('%" + query + "%') ";
         } else if (isTitle) {
+            joinDirector = "";
             where = "WHERE  LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') ";
         }
 
         String sqlQuery = "SELECT  f.*, COUNT(l.user_id) as likes " +
                 "FROM films as f " +
-                "LEFT OUTER JOIN film_director as fd ON fd.film_id = f.film_id " +
-                "LEFT OUTER  JOIN DIRECTORS as d ON d.director_id = fd.DIRECTOR_ID " +
+                joinDirector +
                 "LEFT OUTER  JOIN likes as l ON l.film_id = f.film_id " +
                 where +
                 "GROUP BY f.film_id " +

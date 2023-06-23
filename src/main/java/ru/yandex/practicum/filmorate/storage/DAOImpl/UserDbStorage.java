@@ -1,13 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.DAOImpl;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
@@ -19,6 +11,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @Primary
@@ -89,7 +90,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<Event> getUserEvent(Integer id) {
-        String sqlQuery = "SELECT * FROM feeds WHERE userId = ?";
+        String sqlQuery = "SELECT * FROM feeds WHERE user_id = ?";
         return jdbcTemplate.query(sqlQuery, this::makeEvent, id);
     }
 
@@ -104,11 +105,12 @@ public class UserDbStorage implements UserStorage {
     private Event makeEvent(ResultSet rs, int rowNum) throws SQLException {
         return Event.builder()
                 .timestamp(rs.getLong("timestamp"))
-                .userId(rs.getLong("userId"))
-                .eventType(rs.getString("eventType"))
+                .userId(rs.getLong("user_id"))
+                .eventType(rs.getString("event_type"))
                 .operation(rs.getString("operation"))
-                .eventId(rs.getLong("eventId"))
-                .entityId(rs.getLong("entityId"))
+                .eventId(rs.getLong("event_id"))
+                .entityId(rs.getLong("entity_id"))
                 .build();
     }
+
 }

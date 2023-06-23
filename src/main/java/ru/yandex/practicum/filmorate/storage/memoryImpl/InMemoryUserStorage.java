@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.storage.memoryImpl;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
@@ -64,7 +65,6 @@ public class InMemoryUserStorage implements UserStorage {
         return true;
     }
 
-    @Override
     public List<Event> getUserEvent(Integer id) {
         return null;
     }

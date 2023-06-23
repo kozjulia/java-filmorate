@@ -9,12 +9,14 @@ import lombok.NonNull;
 @AllArgsConstructor
 @Builder
 public class Event {
-    private long timestamp;
-    private long userId;
-    private String eventType;
-    private String operation;
+
     @NonNull
     private long eventId;
+    private long userId;
+    private long timestamp;
+    private String eventType; // одно из значений LIKE, REVIEW или FRIEND
+    private String operation; // одно из значениий REMOVE, ADD, UPDATE
     @NonNull
-    private long entityId;
+    private long entityId;  // идентификатор сущности, с которой произошло событие
+
 }

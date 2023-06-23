@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.memoryImpl;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
 
@@ -9,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -28,7 +29,6 @@ public class InMemoryLikeStorage implements LikeStorage {
         return new ArrayList<>(filmStorage.findFilmById(film.getId()).get().getLikes());
     }
 
-    @Override
     public Map<Long, Set<Long>> findAllUsersWithLikes() {
         return null;
     }

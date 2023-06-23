@@ -1,13 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.DAOImpl;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ReviewNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
@@ -19,6 +11,15 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
+
 @Repository
 @Primary
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public Optional<Review> create(Review review) {
         String sqlQuery = "insert into reviews(review_content, is_positive, user_id, film_id, useful) " +
-                " values (?, ?, ?, ?, ?);";
+                "values (?, ?, ?, ?, ?);";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -50,7 +51,6 @@ public class ReviewDbStorage implements ReviewStorage {
     public Optional<Review> update(Review review) {
         String sqlQuery = "update reviews set review_content = ?, is_positive = ? where review_id = ?;";
         jdbcTemplate.update(sqlQuery, review.getContent(), review.getIsPositive(), review.getReviewId());
-
         return findReviewById(review.getReviewId());
     }
 
@@ -117,4 +117,5 @@ public class ReviewDbStorage implements ReviewStorage {
                 .useful(rs.getInt("useful"))
                 .build();
     }
+
 }

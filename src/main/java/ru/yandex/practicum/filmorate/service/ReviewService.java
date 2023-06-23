@@ -1,9 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -12,15 +8,22 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ReviewService {
-    private final ReviewStorage reviewStorage;
+
     @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
     @Qualifier("userDbStorage")
     private final UserStorage userStorage;
+    @Qualifier("reviewDbStorage")
+    private final ReviewStorage reviewStorage;
     @Qualifier("eventDbStorage")
     private final EventStorage eventStorage;
 
@@ -76,4 +79,5 @@ public class ReviewService {
         reviewStorage.decreaseUseful(reviewId);
         return true;
     }
+
 }

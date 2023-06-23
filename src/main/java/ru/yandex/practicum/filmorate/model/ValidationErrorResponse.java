@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 @Getter
 @RequiredArgsConstructor

@@ -21,4 +21,5 @@ public interface ReviewStorage {
     boolean increaseUseful(Long reviewId);
 
     boolean decreaseUseful(Long reviewId);
+
 }

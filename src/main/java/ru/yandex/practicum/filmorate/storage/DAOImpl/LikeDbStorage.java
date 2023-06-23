@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.storage.DAOImpl;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
 
 import java.util.*;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @Primary
@@ -49,4 +50,5 @@ public class LikeDbStorage implements LikeStorage {
         }
         return usersWithLikes;
     }
+
 }
