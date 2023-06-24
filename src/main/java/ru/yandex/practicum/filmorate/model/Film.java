@@ -1,16 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NonNull;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
 public class Film {
@@ -30,5 +28,6 @@ public class Film {
     private Set<Long> likes = new HashSet<>(); // пользователи, лайкнувшие фильм
     private Set<Genre> genres = new HashSet<>(); // жанры
     private RatingMPA mpa; // рейтинг Ассоциации кинокомпаний (МРА)
+    private Set<Director> directors = new HashSet<>(); // режиссёры
 
 }

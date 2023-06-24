@@ -1,17 +1,21 @@
 package ru.yandex.practicum.filmorate.service;
 
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
+import ru.yandex.practicum.filmorate.storage.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
@@ -22,6 +26,12 @@ public class UserService {
     private final UserStorage userStorage;
     @Qualifier("friendDbStorage")
     private final FriendStorage friendStorage;
+    @Qualifier("filmDbStorage")
+    private final FilmStorage filmStorage;
+    @Qualifier("likeDbStorage")
+    private final LikeStorage likeStorage;
+    @Qualifier("eventDbStorage")
+    private final EventStorage eventStorage;
 
     public User create(User user) {
         return userStorage.create(user).get();
@@ -32,6 +42,13 @@ public class UserService {
             return null;
         }
         return userStorage.update(user).get();
+    }
+
+    public boolean deleteUserById(long userId) {
+        if (!userStorage.isFindUserById(userId)) {
+            return false;
+        }
+        return userStorage.deleteUserById(userId);
     }
 
     public boolean delete(User user) {
@@ -56,6 +73,7 @@ public class UserService {
         User friendRequest = userStorage.findUserById(id).get();
         User friendResponse = userStorage.findUserById(friendId).get();
         friendStorage.addInFriends(friendRequest, friendResponse);
+        eventStorage.createEvent(id, "FRIEND", "ADD", friendId);
         return true;
     }
 
@@ -66,6 +84,7 @@ public class UserService {
         User friendRequest = userStorage.findUserById(id).get();
         User friendResponse = userStorage.findUserById(friendId).get();
         friendStorage.deleteFromFriends(friendRequest, friendResponse);
+        eventStorage.createEvent(id, "FRIEND", "REMOVE", friendId);
         return true;
     }
 
@@ -85,6 +104,48 @@ public class UserService {
         return findFriends(id).stream()
                 .filter(f -> findFriends(otherId).contains(f))
                 .collect(Collectors.toList());
+    }
+
+    public List<Film> getRecommendations(Long id) {
+        // проверка id пользователя
+        if (!userStorage.isFindUserById(id)) {
+            return null;
+        }
+        Map<Long, Set<Long>> usersWithLikes = likeStorage.findAllUsersWithLikes();
+        // Set с filmId для пользователя id
+        Set<Long> userLikeFilms = usersWithLikes.get(id);
+        usersWithLikes.remove(id);
+        if (userLikeFilms == null || usersWithLikes.isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+        // Ищем пользователя с наибольшим совпадением
+        Long userIdWithTopFreq = -1L;
+        int topFreq = -1;
+        for (Long userId : usersWithLikes.keySet()) {
+            Set<Long> filmsId = new HashSet<>(usersWithLikes.get(userId));
+            filmsId.retainAll(userLikeFilms);
+            int countFreq = filmsId.size();
+            if (countFreq > topFreq) {
+                topFreq = countFreq;
+                userIdWithTopFreq = userId;
+            }
+        }
+        // Получаем Set с filmId для пользователя с наибольшим совпадением
+        Set<Long> filmsId = usersWithLikes.get(userIdWithTopFreq);
+        // Удаляем совпадающие filmId
+        filmsId.removeAll(userLikeFilms);
+        // Получаем список фильмов
+        List<Film> films = new ArrayList<>();
+        for (Long filmId : filmsId) {
+            films.add(filmStorage.findFilmById(filmId).get());
+        }
+
+        return films;
+    }
+
+    public List<Event> getUserEvent(Integer userId) {
+        userStorage.findUserById(userId).get();
+        return userStorage.getUserEvent(userId);
     }
 
 }

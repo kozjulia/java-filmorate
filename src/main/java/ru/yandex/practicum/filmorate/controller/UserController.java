@@ -1,17 +1,18 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.util.ValidatorControllers;
 
-import java.util.*;
+import javax.validation.Valid;
+import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
-
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
@@ -48,6 +49,14 @@ public class UserController {
     public void delete(@Valid @RequestBody User user) {
         userService.delete(user);
         log.debug("Удалён пользователь: {}", user);
+    }
+
+    @DeleteMapping("/{userId}")
+    @Validated
+    // удаление пользователя по id
+    public void deleteUserById(@Valid @PathVariable long userId) {
+        userService.deleteUserById(userId);
+        log.debug("Удалён пользователь c id: {}", userId);
     }
 
     @GetMapping
@@ -102,6 +111,22 @@ public class UserController {
         log.debug("Получен список друзей пользователя с id = {}, общих с пользователем с id = {}, " +
                 "количество = {}", id, otherId, users.size());
         return users;
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecommendations(@PathVariable Long id) {
+        List<Film> recommendedFilms = userService.getRecommendations(id);
+        log.debug("Получен список рекомендуемых фильмов для пользователя с id = {}, " +
+                "количество = {}", id, recommendedFilms.size());
+        return recommendedFilms;
+    }
+
+    @GetMapping("/{id}/feed")
+    // новостная лента
+    public List<Event> getEvent(@PathVariable int id) {
+        List<Event> feeds = userService.getUserEvent(id);
+        log.debug("Получена новостная лента пользователя - {}, количество записей {}", userService.findUserById(id).getName(), feeds.size());
+        return feeds;
     }
 
 }

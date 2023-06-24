@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice(assignableTypes = {FilmController.class, UserController.class})
+@RestControllerAdvice(assignableTypes = {FilmController.class, UserController.class, ReviewController.class})
 @Slf4j
 public class ErrorHandler {
 
@@ -39,7 +39,8 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({FilmNotFoundException.class, UserNotFoundException.class,
-            RatingMPANotFoundException.class, GenreNotFoundException.class})
+            RatingMPANotFoundException.class, GenreNotFoundException.class,
+            DirectorNotFoundException.class, ReviewNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final RuntimeException e) {
         return new ErrorResponse(

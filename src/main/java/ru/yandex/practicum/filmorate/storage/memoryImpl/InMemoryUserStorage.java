@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.memoryImpl;
 
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 
 import java.util.*;
 
@@ -36,6 +37,14 @@ public class InMemoryUserStorage implements UserStorage {
         return false;
     }
 
+    public boolean deleteUserById(long userId) {
+        if (users.containsKey(userId)) {
+            users.remove(userId);
+            return true;
+        }
+        return false;
+    }
+
     public List<User> findUsers() {
         return new ArrayList<>(users.values());
     }
@@ -54,6 +63,10 @@ public class InMemoryUserStorage implements UserStorage {
             throw new UserNotFoundException(String.format("Пользователь № %d не найден", userId));
         }
         return true;
+    }
+
+    public List<Event> getUserEvent(Integer id) {
+        return null;
     }
 
     private static Long getNextId() {

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -13,10 +14,14 @@ public interface UserStorage {
 
     boolean delete(User user);
 
+    boolean deleteUserById(long userId);
+
     List<User> findUsers();
 
     Optional<User> findUserById(long userId);
 
     boolean isFindUserById(long userId);
+
+    List<Event> getUserEvent(Integer id);
 
 }

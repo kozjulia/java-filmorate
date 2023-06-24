@@ -1,13 +1,13 @@
 package ru.yandex.practicum.filmorate.util;
 
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @NoArgsConstructor
 @Slf4j
@@ -77,6 +77,11 @@ public class ValidatorControllers {
         if (birthday.isAfter(LocalDate.now())) {
             logAndError("Ошибка! Дата рождения не может быть в будущем.");
         }
+    }
+
+    public static Director validateDirector(Director director) {
+        ValidatorControllers.validateName(director.getName());
+        return director;
     }
 
     private static void logAndError(String exp) {

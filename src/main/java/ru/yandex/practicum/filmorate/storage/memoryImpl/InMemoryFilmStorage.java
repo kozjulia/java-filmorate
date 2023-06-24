@@ -1,10 +1,11 @@
 package ru.yandex.practicum.filmorate.storage.memoryImpl;
 
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.RatingMPA;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 
 import java.util.*;
 
@@ -33,6 +34,14 @@ public class InMemoryFilmStorage implements FilmStorage {
         long idFilm = film.getId();
         if (films.containsKey(idFilm)) {
             films.remove(idFilm);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean deleteFilmById(long filmId) {
+        if (films.containsKey(filmId)) {
+            films.remove(filmId);
             return true;
         }
         return false;
@@ -72,6 +81,42 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public Optional<RatingMPA> findRatingMPAById(long ratingMPAId) {
         return Optional.empty();
+    }
+
+    public List<Director> findDirectors() {
+        return Collections.EMPTY_LIST;
+    }
+
+    public Optional<Director> findDirectorById(long directorId) {
+        return Optional.empty();
+    }
+
+    public boolean isFindDirectorById(long directorId) {
+        return false;
+    }
+
+    public Optional<Director> createDirector(Director director) {
+        return Optional.empty();
+    }
+
+    public Optional<Director> updateDirector(Director director) {
+        return Optional.empty();
+    }
+
+    public boolean deleteDirectorById(Long directorId) {
+        return false;
+    }
+
+    public List<Film> findSortFilmsByDirector(long directorId, String sortBy) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public List<Film> findSortFilmsBySubstring(String query, boolean isDirector, boolean isTitle) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public List<Film> findCommonSortedFilms(long userId, long friendId) {
+        return Collections.EMPTY_LIST;
     }
 
     private static Long getNextId() {

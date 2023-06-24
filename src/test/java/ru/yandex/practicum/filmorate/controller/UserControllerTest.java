@@ -1,16 +1,16 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryFriendStorage;
 import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryUserStorage;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,9 +29,9 @@ class UserControllerTest {
     public void beforeEach() {
         InMemoryUserStorage storage = new InMemoryUserStorage();
         FriendStorage friendStorage = new InMemoryFriendStorage(storage);
-        UserService service = new UserService(storage, friendStorage);
+        UserService service = new UserService(storage, friendStorage, null, null, null);
         controller = new UserController(service);
-        storage.usersId = 0;
+        InMemoryUserStorage.usersId = 0;
         user1 = new User("email1@mail.ru", "user1", LocalDate.of(1980, 01, 01));
         user1.setName("User 1 name");
         user2 = new User("email2@mail.ru", "user2", LocalDate.of(1981, 02, 02));
