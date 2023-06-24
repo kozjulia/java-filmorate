@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import ru.yandex.practicum.filmorate.exception.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.exception.RatingMPANotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -15,7 +16,6 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -100,16 +100,29 @@ public class FilmService {
         return true;
     }
 
-    public List<Film> findPopularFilms(int count, Optional<Integer> genreId, Optional<Integer> year) {
-        List<Film> result = findFilms().stream().sorted(this::compare).collect(Collectors.toList());
-        if (year.isPresent()) {
-            result = result.stream().filter(f -> f.getReleaseDate().getYear() == year.get())
-                    .collect(Collectors.toList());
+    public List<Film> findPopularFilms(int count, Long genreId, Integer year) {
+        if (count < 0) {
+            String message = "Параметр count не может быть отрицательным!";
+            log.warn(message);
+            throw new ValidationException(message);
         }
-        if (genreId.isPresent()) {
-            result = result.stream().filter(f -> f.getGenres().contains(findGenreById(genreId.get()))).collect(
+        if ((year != null) && (year < 0)) {
+            String message = "Параметр year не может быть отрицательным!";
+            log.warn(message);
+            throw new ValidationException(message);
+        }
+
+        List<Film> result = findFilms().stream().sorted(this::compare).collect(Collectors.toList());
+        if (genreId != null) {
+            Genre genre = filmStorage.findGenreById(genreId).orElse(null);
+            result = result.stream().filter(f -> f.getGenres().contains(genre)).collect(
                     Collectors.toList());
         }
+        if (year != null) {
+            result = result.stream().filter(f -> f.getReleaseDate().getYear() == year)
+                    .collect(Collectors.toList());
+        }
+
         return result.stream()
                 .limit(count)
                 .collect(Collectors.toList());
@@ -170,6 +183,11 @@ public class FilmService {
     }
 
     public List<Film> findSortFilmsByDirector(long directorId, String sortBy) {
+        if (!sortBy.equals("year") && !sortBy.equals("likes")) {
+            String message = "Параметр sortBy может быть только year или likes!";
+            log.warn(message);
+            throw new ValidationException(message);
+        }
         if (!filmStorage.isFindDirectorById(directorId)) {
             return Collections.EMPTY_LIST;
         }
@@ -177,7 +195,14 @@ public class FilmService {
     }
 
 
-    public List<Film> findSortFilmsBySubstring(String query, boolean isDirector, boolean isTitle) {
+    public List<Film> findSortFilmsBySubstring(String query, String by) {
+        if (!by.contains("director") && !by.contains("title")) {
+            String message = "Параметр by должен содержать director или/и title!";
+            log.warn(message);
+            throw new ValidationException(message);
+        }
+        boolean isDirector = by.contains("director");
+        boolean isTitle = by.contains("title");
         return filmStorage.findSortFilmsBySubstring(query, isDirector, isTitle);
     }
 

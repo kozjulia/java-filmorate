@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -58,6 +59,11 @@ public class ReviewService {
     }
 
     public List<Review> findReviews(Long filmId, Integer count) {
+        if (count < 0) {
+            String message = "Параметр count не может быть отрицательным!";
+            log.warn(message);
+            throw new ValidationException(message);
+        }
         if (filmId != null && !filmStorage.isFindFilmById(filmId)) {
             return null;
         }

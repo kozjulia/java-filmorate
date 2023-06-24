@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -10,7 +9,6 @@ import ru.yandex.practicum.filmorate.util.ValidatorControllers;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -99,10 +97,12 @@ public class FilmController {
     }
 
     @GetMapping("/films/popular")
-    //  возвращает список из первых count фильмов по количеству лайков.
-    //  Если значение параметра count не задано, возвращает первые 10
+    //  возвращает список из первых count фильмов по количеству лайков
+    //  если значение параметра count не задано, возвращает первые 10
+    //  фильтрация возможна по двум параметрам: по жанру, за указанный год
     public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count,
-                                       @RequestParam Optional<Integer> genreId, @RequestParam Optional<Integer> year) {
+                                       @RequestParam(required = false) Long genreId,
+                                       @RequestParam(required = false) Integer year) {
         List<Film> films = filmService.findPopularFilms(count, genreId, year);
         log.debug("Получен список из первых {} фильмов по количеству лайков, " +
                 "количество = {}", count, films.size());
@@ -188,11 +188,6 @@ public class FilmController {
     @GetMapping("/films/director/{directorId}")
     //  Возвращает список фильмов режиссёра, отсортированных по количеству лайков или году выпуска
     public List<Film> findSortFilmsByDirector(@PathVariable long directorId, @RequestParam String sortBy) {
-        if (!sortBy.equals("year") && !sortBy.equals("likes")) {
-            String message = "Параметр sortBy может быть только year или likes!";
-            log.warn(message);
-            throw new ValidationException(message);
-        }
         List<Film> films = filmService.findSortFilmsByDirector(directorId, sortBy);
         log.debug("Получен отсортированный список фильмов по {}, " +
                 "количество = {}", sortBy, films.size());
@@ -202,14 +197,7 @@ public class FilmController {
     @GetMapping("/films/search")
     // Возвращает список фильмов, отсортированных по популярности, который ищет по подстроке
     public List<Film> findSortFilmsBySubstring(@RequestParam String query, @RequestParam String by) {
-        if (!by.contains("director") && !by.contains("title")) {
-            String message = "Параметр by должен содержать director или/и title!";
-            log.warn(message);
-            throw new ValidationException(message);
-        }
-        boolean isDirector = by.contains("director");
-        boolean isTitle = by.contains("title");
-        List<Film> films = filmService.findSortFilmsBySubstring(query, isDirector, isTitle);
+        List<Film> films = filmService.findSortFilmsBySubstring(query, by);
         log.debug("Получен отсортированный список фильмов, который ищет подстроку \"{}\" в {}, " +
                 "количество = {}", query, by, films.size());
         return films;
