@@ -2,10 +2,7 @@ package ru.yandex.practicum.filmorate.storage.DAOImpl;
 
 import ru.yandex.practicum.filmorate.exception.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RatingMPA;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.Date;
@@ -320,4 +317,5 @@ public class FilmDbStorage implements FilmStorage {
     private Director makeDirector(ResultSet rs, int rowNum) throws SQLException {
         return new Director(rs.getLong("director_id"), rs.getString("director_name"));
     }
+
 }
