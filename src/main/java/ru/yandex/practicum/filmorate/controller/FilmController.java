@@ -7,8 +7,8 @@ import ru.yandex.practicum.filmorate.model.RatingMPA;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.util.ValidatorControllers;
 
-import javax.validation.Valid;
 import java.util.List;
+import javax.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -91,6 +91,26 @@ public class FilmController {
     public boolean dislike(@PathVariable long id, @PathVariable long userId) {
         if (filmService.dislike(id, userId)) {
             log.debug("Пользователь id = {} удалил лайк с фильма id = {}", userId, id);
+            return true;
+        }
+        return false;
+    }
+
+    @PutMapping("/films/{id}/rate/{userId}")
+    //  пользователь ставит оценку фильму
+    public boolean rate(@PathVariable long id, @PathVariable long userId, @RequestParam Integer grade) {
+        if (filmService.rate(id, userId, grade)) {
+            log.debug("Пользователь id = {} поставил оценку {} фильму id = {}", userId, grade, id);
+            return true;
+        }
+        return false;
+    }
+
+    @DeleteMapping("/films/{id}/rate/{userId}")
+    //  пользователь удаляет оценку
+    public boolean unrate(@PathVariable long id, @PathVariable long userId) {
+        if (filmService.unrate(id, userId)) {
+            log.debug("Пользователь id = {} удалил оценку с фильма id = {}", userId, id);
             return true;
         }
         return false;

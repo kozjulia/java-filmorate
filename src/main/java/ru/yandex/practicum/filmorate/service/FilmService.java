@@ -8,10 +8,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.RatingMPA;
-import ru.yandex.practicum.filmorate.storage.EventStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.LikeStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,6 +31,8 @@ public class FilmService {
     private final UserStorage userStorage;
     @Qualifier("likeDbStorage")
     private final LikeStorage likeStorage;
+    @Qualifier("gradeDbStorage")
+    private final GradeStorage gradeStorage;
     @Qualifier("eventDbStorage")
     private final EventStorage eventStorage;
 
@@ -65,12 +64,14 @@ public class FilmService {
     public List<Film> findFilms() {
         return filmStorage.findFilms().stream()
                 .peek(film -> film.setLikes(new HashSet<>(likeStorage.findLikes(film))))
+                .peek(film -> film.setGrades(new HashSet<>(gradeStorage.findGrades(film))))
                 .collect(Collectors.toList());
     }
 
     public Film findFilmById(long filmId) {
         return filmStorage.findFilmById(filmId).stream()
                 .peek(f -> f.setLikes(new HashSet<>(likeStorage.findLikes(f))))
+                .peek(film -> film.setGrades(new HashSet<>(gradeStorage.findGrades(film))))
                 .findFirst().get();
     }
 
@@ -97,6 +98,31 @@ public class FilmService {
         likeStorage.dislike(film);
         likeStorage.like(film);
         eventStorage.createEvent(userId, "LIKE", "REMOVE", id);
+        return true;
+    }
+
+    public boolean rate(long id, long userId, int grade) {
+        if ((grade < 1) || (grade > 10)) {
+            String message = "Параметр grade должен быть от 1 до 10 включительно!";
+            log.warn(message);
+            throw new ValidationException(message);
+        }
+        if (!filmStorage.isFindFilmById(id) || !userStorage.isFindUserById(userId)) {
+            return false;
+        }
+
+        gradeStorage.rate(id, userId, grade);
+        eventStorage.createEvent(userId, "GRADE", "ADD", id);
+        return true;
+    }
+
+    public boolean unrate(long id, long userId) {
+        if (!filmStorage.isFindFilmById(id) || !userStorage.isFindUserById(userId)) {
+            return false;
+        }
+
+        gradeStorage.unrate(id, userId);
+        eventStorage.createEvent(userId, "GRADE", "REMOVE", id);
         return true;
     }
 

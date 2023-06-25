@@ -4,9 +4,11 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.GradeStorage;
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryGradeStorage;
 import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryLikeStorage;
 import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryUserStorage;
 
@@ -32,7 +34,8 @@ class FilmControllerTest {
         InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
         UserStorage userStorage = new InMemoryUserStorage();
         LikeStorage likeStorage = new InMemoryLikeStorage(filmStorage);
-        FilmService service = new FilmService(filmStorage, userStorage, likeStorage, null);
+        GradeStorage gradeStorage = new InMemoryGradeStorage();
+        FilmService service = new FilmService(filmStorage, userStorage, likeStorage, gradeStorage, null);
         controller = new FilmController(service);
         InMemoryFilmStorage.filmsId = 0;
         film1 = new Film("film 1", "FIlm 1 description",
