@@ -4,10 +4,7 @@ import ru.yandex.practicum.filmorate.exception.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.exception.RatingMPANotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RatingMPA;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.Collections;
@@ -138,7 +135,7 @@ public class FilmService {
             throw new ValidationException(message);
         }
 
-        List<Film> result = findFilms().stream().sorted(this::compare).collect(Collectors.toList());
+        List<Film> result = findFilms().stream().sorted(this::compareByGradesAvg).collect(Collectors.toList());
         if (genreId != null) {
             Genre genre = filmStorage.findGenreById(genreId).orElse(null);
             result = result.stream().filter(f -> f.getGenres().contains(genre)).collect(
@@ -234,6 +231,20 @@ public class FilmService {
 
     private int compare(Film film1, Film film2) {
         return film2.getLikes().size() - film1.getLikes().size();
+    }
+
+    private int compareByGradesAvg(Film film1, Film film2) {
+        double avgFilm1 = film1.getGrades().stream()
+                .mapToInt(Grade::getValue)
+                .summaryStatistics()
+                .getAverage();
+        log.info(film1.getGrades().toString());
+        double avgFilm2 = film2.getGrades().stream()
+                .mapToInt(Grade::getValue)
+                .summaryStatistics()
+                .getAverage();
+        log.info(film2.getGrades().toString());
+        return Double.compare(avgFilm2, avgFilm1);
     }
 
     public List<Film> findCommonSortedFilms(long userId, long friendId) {
