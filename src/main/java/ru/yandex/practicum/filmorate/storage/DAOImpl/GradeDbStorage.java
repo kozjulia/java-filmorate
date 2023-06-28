@@ -4,7 +4,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Grade;
 import ru.yandex.practicum.filmorate.storage.GradeStorage;
 
-import java.util.List;
+import java.util.*;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -37,6 +37,19 @@ public class GradeDbStorage implements GradeStorage {
     public List<Grade> findGrades(Film film) {
         String sqlQuery = "select * from grades where film_id = ?";
         return jdbcTemplate.query(sqlQuery, this::makeGrade, film.getId());
+    }
+
+    public Map<Long, Set<Long>> findAllUsersWithPositiveGrades() {
+        Map<Long, Set<Long>> usersWithGrades = new HashMap<>();
+        String sqlQueryUsersId = "select user_id from grades where grade > 5 group by user_id ";
+        List<Long> users = jdbcTemplate.query(sqlQueryUsersId, (rs, rowNum) -> rs.getLong("user_id"));
+        for (Long user : users) {
+            String sqlQueryFilmsId = "select film_id from grades where user_id = ? and grade > 5 ";
+            List<Long> grades = jdbcTemplate.query(sqlQueryFilmsId,
+                    (rs, rowNum) -> rs.getLong("film_id"), user);
+            usersWithGrades.put(user, new HashSet<>(grades));
+        }
+        return usersWithGrades;
     }
 
     private Grade makeGrade(ResultSet rs, int rowNum) throws SQLException {

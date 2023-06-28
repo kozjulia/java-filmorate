@@ -129,6 +129,19 @@ public class FilmController {
         return films;
     }
 
+    @GetMapping("/films/popular/grade")
+    //  возвращает список из первых count фильмов по оценкам
+    //  если значение параметра count не задано, возвращает первые 10
+    //  фильтрация возможна по двум параметрам: по жанру, за указанный год
+    public List<Film> findPopularGradeFilms(@RequestParam(defaultValue = "10") int count,
+                                            @RequestParam(required = false) Long genreId,
+                                            @RequestParam(required = false) Integer year) {
+        List<Film> films = filmService.findPopularGradeFilms(count, genreId, year);
+        log.debug("Получен список из первых {} фильмов по оценкам, " +
+                "количество = {}", count, films.size());
+        return films;
+    }
+
     @GetMapping("/genres")
     // получение всех жанров
     public List<Genre> findGenres() {
@@ -214,20 +227,49 @@ public class FilmController {
         return films;
     }
 
+    @GetMapping("/films/director/grade/{directorId}")
+    //  Возвращает список фильмов режиссёра, отсортированных по оценкам или году выпуска
+    public List<Film> findSortGradeFilmsByDirector(@PathVariable long directorId, @RequestParam String sortBy) {
+        List<Film> films = filmService.findSortGradeFilmsByDirector(directorId, sortBy);
+        log.debug("Получен отсортированный по оценкам список фильмов по {}, " +
+                "количество = {}", sortBy, films.size());
+        return films;
+    }
+
     @GetMapping("/films/search")
     // Возвращает список фильмов, отсортированных по популярности, который ищет по подстроке
     public List<Film> findSortFilmsBySubstring(@RequestParam String query, @RequestParam String by) {
         List<Film> films = filmService.findSortFilmsBySubstring(query, by);
-        log.debug("Получен отсортированный список фильмов, который ищет подстроку \"{}\" в {}, " +
+        log.debug("Получен отсортированный список фильмов, который ищет подстроку {} в {}, " +
+                "количество = {}", query, by, films.size());
+        return films;
+    }
+
+    @GetMapping("/films/search/grade")
+    // Возвращает список фильмов, отсортированных по оценкам, который ищет по подстроке
+    public List<Film> findSortGradeFilmsBySubstring(@RequestParam String query, @RequestParam String by) {
+        List<Film> films = filmService.findSortGradeFilmsBySubstring(query, by);
+        log.debug("Получен отсортированный по оценкам список фильмов, который ищет подстроку {} в {}, " +
                 "количество = {}", query, by, films.size());
         return films;
     }
 
     @GetMapping("/films/common")
-    // Возвращает список общих фильмов, отсортированных по популярности.
-    public List<Film> findCommonSortedFilms(@RequestParam long userId, @RequestParam long friendId) {
-        List<Film> films = filmService.findCommonSortedFilms(userId, friendId);
-        log.debug("Получен список общих фильмов у пользователей {} и {}.", userId, friendId);
+    // Возвращает список общих фильмов, отсортированных по популярности
+    public List<Film> findCommonSortFilms(@RequestParam long userId, @RequestParam long friendId) {
+        List<Film> films = filmService.findCommonSortFilms(userId, friendId);
+        log.debug("Получен список общих отсортированных фильмов " +
+                "у пользователей {} и {}.", userId, friendId);
         return films;
     }
+
+    @GetMapping("/films/common/grade")
+    // Возвращает список общих фильмов, отсортированных по оценкам
+    public List<Film> findCommonSortGradeFilms(@RequestParam long userId, @RequestParam long friendId) {
+        List<Film> films = filmService.findCommonSortGradeFilms(userId, friendId);
+        log.debug("Получен список общих отсортированных по оценкам фильмов " +
+                "у пользователей {} и {}.", userId, friendId);
+        return films;
+    }
+
 }

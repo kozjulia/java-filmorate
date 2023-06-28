@@ -111,11 +111,23 @@ public class InMemoryFilmStorage implements FilmStorage {
         return Collections.EMPTY_LIST;
     }
 
+    public List<Film> findSortGradeFilmsByDirector(long directorId, String sortBy) {
+        return Collections.EMPTY_LIST;
+    }
+
     public List<Film> findSortFilmsBySubstring(String query, boolean isDirector, boolean isTitle) {
         return Collections.EMPTY_LIST;
     }
 
-    public List<Film> findCommonSortedFilms(long userId, long friendId) {
+    public List<Film> findSortGradeFilmsBySubstring(String query, boolean isDirector, boolean isTitle) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public List<Film> findCommonSortFilms(long userId, long friendId) {
+        return Collections.EMPTY_LIST;
+    }
+
+    public List<Film> findCommonSortGradeFilms(long userId, long friendId) {
         return Collections.EMPTY_LIST;
     }
 

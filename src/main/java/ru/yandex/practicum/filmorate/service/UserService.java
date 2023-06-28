@@ -2,12 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.*;
 import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.storage.EventStorage;
-import ru.yandex.practicum.filmorate.storage.FriendStorage;
-import ru.yandex.practicum.filmorate.storage.LikeStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,6 +26,8 @@ public class UserService {
     private final FilmStorage filmStorage;
     @Qualifier("likeDbStorage")
     private final LikeStorage likeStorage;
+    @Qualifier("gradeDbStorage")
+    private final GradeStorage gradeStorage;
     @Qualifier("eventDbStorage")
     private final EventStorage eventStorage;
 
@@ -138,6 +136,46 @@ public class UserService {
         List<Film> films = new ArrayList<>();
         for (Long filmId : filmsId) {
             films.add(filmStorage.findFilmById(filmId).get());
+        }
+
+        return films;
+    }
+
+    public List<Film> getRecommendationsGrade(Long id) {
+        // проверка id пользователя
+        if (!userStorage.isFindUserById(id)) {
+            return null;
+        }
+        Map<Long, Set<Long>> usersWithPositiveGrades = gradeStorage.findAllUsersWithPositiveGrades();
+        // Set с filmId для пользователя id
+        Set<Long> userGradeFilms = usersWithPositiveGrades.get(id);
+        usersWithPositiveGrades.remove(id);
+        if (userGradeFilms == null || usersWithPositiveGrades.isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+        // Ищем пользователя с наибольшим совпадением
+        Long userIdWithTopFreq = -1L;
+        int topFreq = -1;
+        for (Long userId : usersWithPositiveGrades.keySet()) {
+            Set<Long> filmsId = new HashSet<>(usersWithPositiveGrades.get(userId));
+            filmsId.retainAll(userGradeFilms);
+            int countFreq = filmsId.size();
+            if (countFreq > topFreq) {
+                topFreq = countFreq;
+                userIdWithTopFreq = userId;
+            }
+        }
+        // Получаем Set с filmId для пользователя с наибольшим совпадением
+        Set<Long> filmsId = usersWithPositiveGrades.get(userIdWithTopFreq);
+        // Удаляем совпадающие filmId
+        filmsId.removeAll(userGradeFilms);
+        // Получаем список фильмов
+        List<Film> films = new ArrayList<>();
+        for (Long filmId : filmsId) {
+            films.add(filmStorage.findFilmById(filmId).stream()
+                    .peek(f -> f.setLikes(new HashSet<>(likeStorage.findLikes(f))))
+                    .peek(film -> film.setGrades(new HashSet<>(gradeStorage.findGrades(film))))
+                    .findFirst().get());
         }
 
         return films;

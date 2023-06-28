@@ -121,11 +121,20 @@ public class UserController {
         return recommendedFilms;
     }
 
+    @GetMapping("/{id}/recommendations/grade")
+    public List<Film> getRecommendationsGrade(@PathVariable Long id) {
+        List<Film> recommendedFilms = userService.getRecommendationsGrade(id);
+        log.debug("Получен список рекомендуемых фильмов по оценкам для пользователя с id = {}, " +
+                "количество = {}", id, recommendedFilms.size());
+        return recommendedFilms;
+    }
+
     @GetMapping("/{id}/feed")
     // новостная лента
     public List<Event> getEvent(@PathVariable int id) {
         List<Event> feeds = userService.getUserEvent(id);
-        log.debug("Получена новостная лента пользователя - {}, количество записей {}", userService.findUserById(id).getName(), feeds.size());
+        log.debug("Получена новостная лента пользователя - {}, количество записей {}",
+                userService.findUserById(id).getName(), feeds.size());
         return feeds;
     }
 

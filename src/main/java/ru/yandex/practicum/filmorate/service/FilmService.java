@@ -4,10 +4,7 @@ import ru.yandex.practicum.filmorate.exception.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.exception.RatingMPANotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RatingMPA;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.Collections;
@@ -154,6 +151,34 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
+    public List<Film> findPopularGradeFilms(int count, Long genreId, Integer year) {
+        if (count < 0) {
+            String message = "Параметр count не может быть отрицательным!";
+            log.warn(message);
+            throw new ValidationException(message);
+        }
+        if ((year != null) && (year < 0)) {
+            String message = "Параметр year не может быть отрицательным!";
+            log.warn(message);
+            throw new ValidationException(message);
+        }
+
+        List<Film> result = findFilms().stream().sorted(this::compareGrade).collect(Collectors.toList());
+        if (genreId != null) {
+            Genre genre = filmStorage.findGenreById(genreId).orElse(null);
+            result = result.stream().filter(f -> f.getGenres().contains(genre)).collect(
+                    Collectors.toList());
+        }
+        if (year != null) {
+            result = result.stream().filter(f -> f.getReleaseDate().getYear() == year)
+                    .collect(Collectors.toList());
+        }
+
+        return result.stream()
+                .limit(count)
+                .collect(Collectors.toList());
+    }
+
     public List<Genre> findGenres() {
         return filmStorage.findGenres();
     }
@@ -220,6 +245,18 @@ public class FilmService {
         return filmStorage.findSortFilmsByDirector(directorId, sortBy);
     }
 
+    public List<Film> findSortGradeFilmsByDirector(long directorId, String sortBy) {
+        if (!sortBy.equals("year") && !sortBy.equals("grades")) {
+            String message = "Параметр sortBy может быть только year или grades!";
+            log.warn(message);
+            throw new ValidationException(message);
+        }
+        if (!filmStorage.isFindDirectorById(directorId)) {
+            return Collections.EMPTY_LIST;
+        }
+        return filmStorage.findSortGradeFilmsByDirector(directorId, sortBy);
+    }
+
 
     public List<Film> findSortFilmsBySubstring(String query, String by) {
         if (!by.contains("director") && !by.contains("title")) {
@@ -232,11 +269,38 @@ public class FilmService {
         return filmStorage.findSortFilmsBySubstring(query, isDirector, isTitle);
     }
 
+    public List<Film> findSortGradeFilmsBySubstring(String query, String by) {
+        if (!by.contains("director") && !by.contains("title")) {
+            String message = "Параметр by должен содержать director или/и title!";
+            log.warn(message);
+            throw new ValidationException(message);
+        }
+        boolean isDirector = by.contains("director");
+        boolean isTitle = by.contains("title");
+        return filmStorage.findSortGradeFilmsBySubstring(query, isDirector, isTitle);
+    }
+
+    public List<Film> findCommonSortFilms(long userId, long friendId) {
+        return filmStorage.findCommonSortFilms(userId, friendId);
+    }
+
+    public List<Film> findCommonSortGradeFilms(long userId, long friendId) {
+        return filmStorage.findCommonSortGradeFilms(userId, friendId);
+    }
+
     private int compare(Film film1, Film film2) {
         return film2.getLikes().size() - film1.getLikes().size();
     }
 
-    public List<Film> findCommonSortedFilms(long userId, long friendId) {
-        return filmStorage.findCommonSortedFilms(userId, friendId);
+    private int compareGrade(Film film1, Film film2) {
+        return (int) (film2.getGrades().stream()
+                .mapToInt(Grade::getValue)
+                .summaryStatistics()
+                .getAverage()
+                - film1.getGrades().stream()
+                .mapToInt(Grade::getValue)
+                .summaryStatistics()
+                .getAverage());
     }
+
 }

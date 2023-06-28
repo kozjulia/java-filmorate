@@ -201,18 +201,40 @@ public class FilmDbStorage implements FilmStorage {
         return Collections.EMPTY_LIST;
     }
 
+    public List<Film> findSortGradeFilmsByDirector(long directorId, String sortBy) {
+        if (sortBy.equals("grades")) {
+            String sqlQuery = "select f.*, AVG(g.grade) as avg_grades " +
+                    "from films as f " +
+                    "INNER JOIN film_director as fd ON fd.film_id = f.film_id " +
+                    "LEFT OUTER JOIN grades as g ON g.film_id = f.film_id " +
+                    "where fd.director_id = ? " +
+                    "GROUP BY f.film_id " +
+                    "ORDER by avg_grades DESC";
+            return jdbcTemplate.query(sqlQuery, this::makeFilm, directorId);
+        }
+        if (sortBy.equals("year")) {
+            String sqlQuery = "select f.*,  EXTRACT(YEAR FROM CAST(f.release_date AS date)) as year_film " +
+                    "from films as f " +
+                    "INNER JOIN film_director as fd ON fd.film_id = f.film_id " +
+                    "where fd.director_id = ? " +
+                    "ORDER by year_film ";
+            return jdbcTemplate.query(sqlQuery, this::makeFilm, directorId);
+        }
+        return Collections.EMPTY_LIST;
+    }
+
     public List<Film> findSortFilmsBySubstring(String query, boolean isDirector, boolean isTitle) {
         String where = "";
         String joinDirector = "LEFT OUTER JOIN film_director as fd ON fd.film_id = f.film_id " +
-                "LEFT OUTER  JOIN DIRECTORS as d ON d.director_id = fd.DIRECTOR_ID ";
+                "LEFT OUTER JOIN DIRECTORS as d ON d.director_id = fd.DIRECTOR_ID ";
         if (isDirector && isTitle) {
-            where = "WHERE  LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') OR " +
+            where = "WHERE LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') OR " +
                     "LOWER(d.DIRECTOR_NAME) LIKE LOWER('%" + query + "%') ";
         } else if (isDirector) {
             where = "WHERE LOWER(d.DIRECTOR_NAME) LIKE LOWER('%" + query + "%') ";
         } else if (isTitle) {
             joinDirector = "";
-            where = "WHERE  LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') ";
+            where = "WHERE LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') ";
         }
 
         String sqlQuery = "SELECT  f.*, COUNT(l.user_id) as likes " +
@@ -225,7 +247,31 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, this::makeFilm);
     }
 
-    public List<Film> findCommonSortedFilms(long userId, long friendId) {
+    public List<Film> findSortGradeFilmsBySubstring(String query, boolean isDirector, boolean isTitle) {
+        String where = "";
+        String joinDirector = "LEFT OUTER JOIN film_director as fd ON fd.film_id = f.film_id " +
+                "LEFT OUTER JOIN DIRECTORS as d ON d.director_id = fd.DIRECTOR_ID ";
+        if (isDirector && isTitle) {
+            where = "WHERE LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') OR " +
+                    "LOWER(d.DIRECTOR_NAME) LIKE LOWER('%" + query + "%') ";
+        } else if (isDirector) {
+            where = "WHERE LOWER(d.DIRECTOR_NAME) LIKE LOWER('%" + query + "%') ";
+        } else if (isTitle) {
+            joinDirector = "";
+            where = "WHERE LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') ";
+        }
+
+        String sqlQuery = "SELECT  f.*, AVG(g.grade) as avg_grades " +
+                "FROM films as f " +
+                joinDirector +
+                "LEFT OUTER JOIN grades as g ON g.film_id = f.film_id " +
+                where +
+                "GROUP BY f.film_id " +
+                "ORDER BY avg_grades DESC ";
+        return jdbcTemplate.query(sqlQuery, this::makeFilm);
+    }
+
+    public List<Film> findCommonSortFilms(long userId, long friendId) {
         String sqlQuery = "SELECT f.*, COUNT(l.user_id) as likes " +
                 "FROM films as f " +
                 "LEFT OUTER JOIN likes as l ON l.film_id = f.film_id " +
@@ -233,6 +279,17 @@ public class FilmDbStorage implements FilmStorage {
                 "AND f.film_id IN (SELECT l2.film_id FROM likes l2 WHERE l2.user_id = ?) " +
                 "GROUP BY f.film_id " +
                 "ORDER BY likes DESC";
+        return jdbcTemplate.query(sqlQuery, this::makeFilm, userId, friendId);
+    }
+
+    public List<Film> findCommonSortGradeFilms(long userId, long friendId) {
+        String sqlQuery = "SELECT f.*, AVG(g.grade) as avg_grades " +
+                "FROM films as f " +
+                "LEFT OUTER JOIN grades as g ON g.film_id = f.film_id " +
+                "WHERE f.film_id IN (SELECT film_id FROM GRADES WHERE user_id = ?) " +
+                "AND f.film_id IN (SELECT film_id FROM GRADES WHERE user_id = ?) " +
+                "GROUP BY f.film_id " +
+                "ORDER BY avg_grades DESC ";
         return jdbcTemplate.query(sqlQuery, this::makeFilm, userId, friendId);
     }
 
