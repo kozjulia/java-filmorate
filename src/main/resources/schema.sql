@@ -1,6 +1,5 @@
 -- удаляем все таблицы
-DROP TABLE PUBLIC.grades IF EXISTS;
-DROP TABLE PUBLIC.likes IF EXISTS;
+DROP TABLE PUBLIC.marks IF EXISTS;
 DROP TABLE PUBLIC.friends IF EXISTS;
 DROP TABLE PUBLIC.reviews IF EXISTS;
 DROP TABLE PUBLIC.feeds IF EXISTS;
@@ -65,16 +64,10 @@ CREATE TABLE IF NOT EXISTS film_director (
   CONSTRAINT FILM_DIRECTOR_PK PRIMARY KEY (film_id, director_id)
 );
 
-CREATE TABLE IF NOT EXISTS likes (
+CREATE TABLE IF NOT EXISTS marks (
     user_id bigint REFERENCES public.users(user_id) ON UPDATE RESTRICT ON DELETE CASCADE,
     film_id bigint REFERENCES public.films(film_id) ON UPDATE RESTRICT ON DELETE CASCADE,
-    CONSTRAINT LIKES_PK PRIMARY KEY (user_id, film_id)
-);
-
-CREATE TABLE IF NOT EXISTS grades (
-    user_id bigint REFERENCES public.users(user_id) ON UPDATE RESTRICT ON DELETE CASCADE,
-    film_id bigint REFERENCES public.films(film_id) ON UPDATE RESTRICT ON DELETE CASCADE,
-    grade integer NOT NULL,
+    mark integer NOT NULL DEFAULT 6,
     CONSTRAINT GRADES_PK PRIMARY KEY (user_id, film_id)
 );
 

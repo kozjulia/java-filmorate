@@ -5,8 +5,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
-import ru.yandex.practicum.filmorate.storage.GradeStorage;
-import ru.yandex.practicum.filmorate.storage.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.MarkStorage;
 import ru.yandex.practicum.filmorate.storage.memoryImpl.*;
 
 import java.time.LocalDate;
@@ -31,10 +30,8 @@ class UserControllerTest {
         InMemoryUserStorage storage = new InMemoryUserStorage();
         FriendStorage friendStorage = new InMemoryFriendStorage(storage);
         InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
-        LikeStorage likeStorage = new InMemoryLikeStorage(filmStorage);
-        GradeStorage gradeStorage = new InMemoryGradeStorage();
-        UserService service = new UserService(storage, friendStorage, filmStorage,
-                likeStorage, gradeStorage, null);
+        MarkStorage gradeStorage = new InMemoryMarkStorage();
+        UserService service = new UserService(storage, friendStorage, filmStorage, gradeStorage, null);
         controller = new UserController(service);
         InMemoryUserStorage.usersId = 0;
         user1 = new User("email1@mail.ru", "user1", LocalDate.of(1980, 01, 01));

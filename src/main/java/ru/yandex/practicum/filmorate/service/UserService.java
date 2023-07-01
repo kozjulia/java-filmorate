@@ -24,10 +24,8 @@ public class UserService {
     private final FriendStorage friendStorage;
     @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
-    @Qualifier("likeDbStorage")
-    private final LikeStorage likeStorage;
-    @Qualifier("gradeDbStorage")
-    private final GradeStorage gradeStorage;
+    @Qualifier("markDbStorage")
+    private final MarkStorage markStorage;
     @Qualifier("eventDbStorage")
     private final EventStorage eventStorage;
 
@@ -109,19 +107,19 @@ public class UserService {
         if (!userStorage.isFindUserById(id)) {
             return null;
         }
-        Map<Long, Set<Long>> usersWithLikes = likeStorage.findAllUsersWithLikes();
+        Map<Long, Set<Long>> usersWithPositiveMarks = markStorage.findAllUsersWithPositiveMarks();
         // Set с filmId для пользователя id
-        Set<Long> userLikeFilms = usersWithLikes.get(id);
-        usersWithLikes.remove(id);
-        if (userLikeFilms == null || usersWithLikes.isEmpty()) {
+        Set<Long> userMarkFilms = usersWithPositiveMarks.get(id);
+        usersWithPositiveMarks.remove(id);
+        if (userMarkFilms == null || usersWithPositiveMarks.isEmpty()) {
             return Collections.EMPTY_LIST;
         }
         // Ищем пользователя с наибольшим совпадением
         Long userIdWithTopFreq = -1L;
         int topFreq = -1;
-        for (Long userId : usersWithLikes.keySet()) {
-            Set<Long> filmsId = new HashSet<>(usersWithLikes.get(userId));
-            filmsId.retainAll(userLikeFilms);
+        for (Long userId : usersWithPositiveMarks.keySet()) {
+            Set<Long> filmsId = new HashSet<>(usersWithPositiveMarks.get(userId));
+            filmsId.retainAll(userMarkFilms);
             int countFreq = filmsId.size();
             if (countFreq > topFreq) {
                 topFreq = countFreq;
@@ -129,52 +127,15 @@ public class UserService {
             }
         }
         // Получаем Set с filmId для пользователя с наибольшим совпадением
-        Set<Long> filmsId = usersWithLikes.get(userIdWithTopFreq);
+        Set<Long> filmsId = usersWithPositiveMarks.get(userIdWithTopFreq);
         // Удаляем совпадающие filmId
-        filmsId.removeAll(userLikeFilms);
-        // Получаем список фильмов
-        List<Film> films = new ArrayList<>();
-        for (Long filmId : filmsId) {
-            films.add(filmStorage.findFilmById(filmId).get());
-        }
-
-        return films;
-    }
-
-    public List<Film> getRecommendationsGrade(Long id) {
-        // проверка id пользователя
-        if (!userStorage.isFindUserById(id)) {
-            return null;
-        }
-        Map<Long, Set<Long>> usersWithPositiveGrades = gradeStorage.findAllUsersWithPositiveGrades();
-        // Set с filmId для пользователя id
-        Set<Long> userGradeFilms = usersWithPositiveGrades.get(id);
-        usersWithPositiveGrades.remove(id);
-        if (userGradeFilms == null || usersWithPositiveGrades.isEmpty()) {
-            return Collections.EMPTY_LIST;
-        }
-        // Ищем пользователя с наибольшим совпадением
-        Long userIdWithTopFreq = -1L;
-        int topFreq = -1;
-        for (Long userId : usersWithPositiveGrades.keySet()) {
-            Set<Long> filmsId = new HashSet<>(usersWithPositiveGrades.get(userId));
-            filmsId.retainAll(userGradeFilms);
-            int countFreq = filmsId.size();
-            if (countFreq > topFreq) {
-                topFreq = countFreq;
-                userIdWithTopFreq = userId;
-            }
-        }
-        // Получаем Set с filmId для пользователя с наибольшим совпадением
-        Set<Long> filmsId = usersWithPositiveGrades.get(userIdWithTopFreq);
-        // Удаляем совпадающие filmId
-        filmsId.removeAll(userGradeFilms);
+        filmsId.removeAll(userMarkFilms);
         // Получаем список фильмов
         List<Film> films = new ArrayList<>();
         for (Long filmId : filmsId) {
             films.add(filmStorage.findFilmById(filmId).stream()
-                    .peek(f -> f.setLikes(new HashSet<>(likeStorage.findLikes(f))))
-                    .peek(film -> film.setGrades(new HashSet<>(gradeStorage.findGrades(film))))
+                    .peek(f -> f.setLikes(new HashSet<>(markStorage.findLikes(f))))
+                    .peek(film -> film.setMarks(new HashSet<>(markStorage.findMarks(film))))
                     .findFirst().get());
         }
 

@@ -25,7 +25,9 @@ public class UserController {
 
     @PostMapping
     @Validated
-    // создание пользователя
+    /**
+     * создание пользователя
+     */
     public User create(@Valid @RequestBody User user) {
         user = ValidatorControllers.validateUser(user);
         User newUser = userService.create(user);
@@ -35,7 +37,9 @@ public class UserController {
 
     @PutMapping
     @Validated
-    // обновление пользователя
+    /**
+     * обновление пользователя
+     */
     public User update(@Valid @RequestBody User user) {
         user = ValidatorControllers.validateUser(user);
         User newUser = userService.update(user);
@@ -45,7 +49,9 @@ public class UserController {
 
     @DeleteMapping
     @Validated
-    // удаление пользователя
+    /**
+     * удаление пользователя
+     */
     public void delete(@Valid @RequestBody User user) {
         userService.delete(user);
         log.debug("Удалён пользователь: {}", user);
@@ -53,14 +59,18 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @Validated
-    // удаление пользователя по id
+    /**
+     * удаление пользователя по id
+     */
     public void deleteUserById(@Valid @PathVariable long userId) {
         userService.deleteUserById(userId);
         log.debug("Удалён пользователь c id: {}", userId);
     }
 
     @GetMapping
-    // получение списка всех пользователей
+    /**
+     * получение списка всех пользователей
+     */
     public List<User> findUsers() {
         List<User> users = userService.findUsers();
         log.debug("Получен список пользователей, количество = {}", users.size());
@@ -68,7 +78,9 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    // получение пользователя по id
+    /**
+     * получение пользователя по id
+     */
     public User findUserById(@PathVariable long userId) {
         User user = userService.findUserById(userId);
         log.debug("Получен пользователь с id = {}", userId);
@@ -76,7 +88,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    //  добавление в друзья
+    /**
+     * добавление в друзья
+     */
     public boolean addInFriends(@PathVariable long id, @PathVariable long friendId) {
         if (userService.addInFriends(id, friendId)) {
             log.debug("Пользователь c id = {} добавил в друзья пользователя с id = {}", id, friendId);
@@ -86,7 +100,9 @@ public class UserController {
     }
 
     @DeleteMapping("{id}/friends/{friendId}")
-    //  удаление из друзей
+    /**
+     * удаление из друзей
+     */
     public boolean deleteFromFriends(@PathVariable long id, @PathVariable long friendId) {
         if (userService.deleteFromFriends(id, friendId)) {
             log.debug("Пользователь c id = {} удалил из друзей пользователя с id = {}", id, friendId);
@@ -96,7 +112,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    // возвращаем список пользователей, являющихся его друзьями
+    /**
+     * получение списка пользователей, являющихся его друзьями
+     */
     public List<User> findFriends(@PathVariable long id) {
         List<User> users = userService.findFriends(id);
         log.debug("Получен список пользователей, являющимися друзьями пользователя с id = {}, " +
@@ -105,7 +123,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    // список друзей, общих с другим пользователем
+    /**
+     * получение списка друзей, общих с другим пользователем
+     */
     public List<User> findMutualFriends(@PathVariable long id, @PathVariable long otherId) {
         List<User> users = userService.findMutualFriends(id, otherId);
         log.debug("Получен список друзей пользователя с id = {}, общих с пользователем с id = {}, " +
@@ -114,6 +134,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}/recommendations")
+    /**
+     * получение списка рекомендуемых фильмов для пользователя
+     */
     public List<Film> getRecommendations(@PathVariable Long id) {
         List<Film> recommendedFilms = userService.getRecommendations(id);
         log.debug("Получен список рекомендуемых фильмов для пользователя с id = {}, " +
@@ -121,16 +144,10 @@ public class UserController {
         return recommendedFilms;
     }
 
-    @GetMapping("/{id}/recommendations/grade")
-    public List<Film> getRecommendationsGrade(@PathVariable Long id) {
-        List<Film> recommendedFilms = userService.getRecommendationsGrade(id);
-        log.debug("Получен список рекомендуемых фильмов по оценкам для пользователя с id = {}, " +
-                "количество = {}", id, recommendedFilms.size());
-        return recommendedFilms;
-    }
-
     @GetMapping("/{id}/feed")
-    // новостная лента
+    /**
+     * получение новостной ленты пользователя
+     */
     public List<Event> getEvent(@PathVariable int id) {
         List<Event> feeds = userService.getUserEvent(id);
         log.debug("Получена новостная лента пользователя - {}, количество записей {}",

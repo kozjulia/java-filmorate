@@ -26,10 +26,8 @@ public class FilmService {
     private final FilmStorage filmStorage;
     @Qualifier("userDbStorage")
     private final UserStorage userStorage;
-    @Qualifier("likeDbStorage")
-    private final LikeStorage likeStorage;
-    @Qualifier("gradeDbStorage")
-    private final GradeStorage gradeStorage;
+    @Qualifier("markDbStorage")
+    private final MarkStorage markStorage;
     @Qualifier("eventDbStorage")
     private final EventStorage eventStorage;
 
@@ -60,27 +58,31 @@ public class FilmService {
 
     public List<Film> findFilms() {
         return filmStorage.findFilms().stream()
-                .peek(film -> film.setLikes(new HashSet<>(likeStorage.findLikes(film))))
-                .peek(film -> film.setGrades(new HashSet<>(gradeStorage.findGrades(film))))
+                .peek(film -> film.setLikes(new HashSet<>(markStorage.findLikes(film))))
+                .peek(film -> film.setMarks(new HashSet<>(markStorage.findMarks(film))))
                 .collect(Collectors.toList());
     }
 
     public Film findFilmById(long filmId) {
         return filmStorage.findFilmById(filmId).stream()
-                .peek(f -> f.setLikes(new HashSet<>(likeStorage.findLikes(f))))
-                .peek(film -> film.setGrades(new HashSet<>(gradeStorage.findGrades(film))))
+                .peek(f -> f.setLikes(new HashSet<>(markStorage.findLikes(f))))
+                .peek(film -> film.setMarks(new HashSet<>(markStorage.findMarks(film))))
                 .findFirst().get();
     }
 
-    public boolean like(long id, long userId) {
+    public boolean like(long id, long userId, Integer mark) {
+        if ((mark < 1) || (mark > 10)) {
+            String message = "Параметр mark должен быть от 1 до 10 включительно!";
+            log.warn(message);
+            throw new ValidationException(message, 10001);
+        }
         if (!filmStorage.isFindFilmById(id) || !userStorage.isFindUserById(userId)) {
             return false;
         }
 
         Film film = findFilmById(id);
         film.getLikes().add(userId);
-        likeStorage.dislike(film);
-        likeStorage.like(film);
+        markStorage.rate(id, userId, mark);
         eventStorage.createEvent(userId, "LIKE", "ADD", id);
         return true;
     }
@@ -92,34 +94,8 @@ public class FilmService {
 
         Film film = findFilmById(id);
         film.getLikes().remove(userId);
-        likeStorage.dislike(film);
-        likeStorage.like(film);
+        markStorage.unrate(id, userId);
         eventStorage.createEvent(userId, "LIKE", "REMOVE", id);
-        return true;
-    }
-
-    public boolean rate(long id, long userId, int grade) {
-        if ((grade < 1) || (grade > 10)) {
-            String message = "Параметр grade должен быть от 1 до 10 включительно!";
-            log.warn(message);
-            throw new ValidationException(message);
-        }
-        if (!filmStorage.isFindFilmById(id) || !userStorage.isFindUserById(userId)) {
-            return false;
-        }
-
-        gradeStorage.rate(id, userId, grade);
-        eventStorage.createEvent(userId, "GRADE", "ADD", id);
-        return true;
-    }
-
-    public boolean unrate(long id, long userId) {
-        if (!filmStorage.isFindFilmById(id) || !userStorage.isFindUserById(userId)) {
-            return false;
-        }
-
-        gradeStorage.unrate(id, userId);
-        eventStorage.createEvent(userId, "GRADE", "REMOVE", id);
         return true;
     }
 
@@ -127,43 +103,15 @@ public class FilmService {
         if (count < 0) {
             String message = "Параметр count не может быть отрицательным!";
             log.warn(message);
-            throw new ValidationException(message);
+            throw new ValidationException(message, 10002);
         }
         if ((year != null) && (year < 0)) {
             String message = "Параметр year не может быть отрицательным!";
             log.warn(message);
-            throw new ValidationException(message);
+            throw new ValidationException(message, 10003);
         }
 
-        List<Film> result = findFilms().stream().sorted(this::compare).collect(Collectors.toList());
-        if (genreId != null) {
-            Genre genre = filmStorage.findGenreById(genreId).orElse(null);
-            result = result.stream().filter(f -> f.getGenres().contains(genre)).collect(
-                    Collectors.toList());
-        }
-        if (year != null) {
-            result = result.stream().filter(f -> f.getReleaseDate().getYear() == year)
-                    .collect(Collectors.toList());
-        }
-
-        return result.stream()
-                .limit(count)
-                .collect(Collectors.toList());
-    }
-
-    public List<Film> findPopularGradeFilms(int count, Long genreId, Integer year) {
-        if (count < 0) {
-            String message = "Параметр count не может быть отрицательным!";
-            log.warn(message);
-            throw new ValidationException(message);
-        }
-        if ((year != null) && (year < 0)) {
-            String message = "Параметр year не может быть отрицательным!";
-            log.warn(message);
-            throw new ValidationException(message);
-        }
-
-        List<Film> result = findFilms().stream().sorted(this::compareGrade).collect(Collectors.toList());
+        List<Film> result = findFilms().stream().sorted(this::compareMark).collect(Collectors.toList());
         if (genreId != null) {
             Genre genre = filmStorage.findGenreById(genreId).orElse(null);
             result = result.stream().filter(f -> f.getGenres().contains(genre)).collect(
@@ -237,7 +185,7 @@ public class FilmService {
         if (!sortBy.equals("year") && !sortBy.equals("likes")) {
             String message = "Параметр sortBy может быть только year или likes!";
             log.warn(message);
-            throw new ValidationException(message);
+            throw new ValidationException(message, 10004);
         }
         if (!filmStorage.isFindDirectorById(directorId)) {
             return Collections.EMPTY_LIST;
@@ -245,62 +193,30 @@ public class FilmService {
         return filmStorage.findSortFilmsByDirector(directorId, sortBy);
     }
 
-    public List<Film> findSortGradeFilmsByDirector(long directorId, String sortBy) {
-        if (!sortBy.equals("year") && !sortBy.equals("grades")) {
-            String message = "Параметр sortBy может быть только year или grades!";
-            log.warn(message);
-            throw new ValidationException(message);
-        }
-        if (!filmStorage.isFindDirectorById(directorId)) {
-            return Collections.EMPTY_LIST;
-        }
-        return filmStorage.findSortGradeFilmsByDirector(directorId, sortBy);
-    }
-
-
     public List<Film> findSortFilmsBySubstring(String query, String by) {
         if (!by.contains("director") && !by.contains("title")) {
             String message = "Параметр by должен содержать director или/и title!";
             log.warn(message);
-            throw new ValidationException(message);
+            throw new ValidationException(message, 10005);
         }
         boolean isDirector = by.contains("director");
         boolean isTitle = by.contains("title");
         return filmStorage.findSortFilmsBySubstring(query, isDirector, isTitle);
     }
 
-    public List<Film> findSortGradeFilmsBySubstring(String query, String by) {
-        if (!by.contains("director") && !by.contains("title")) {
-            String message = "Параметр by должен содержать director или/и title!";
-            log.warn(message);
-            throw new ValidationException(message);
-        }
-        boolean isDirector = by.contains("director");
-        boolean isTitle = by.contains("title");
-        return filmStorage.findSortGradeFilmsBySubstring(query, isDirector, isTitle);
-    }
-
     public List<Film> findCommonSortFilms(long userId, long friendId) {
         return filmStorage.findCommonSortFilms(userId, friendId);
     }
 
-    public List<Film> findCommonSortGradeFilms(long userId, long friendId) {
-        return filmStorage.findCommonSortGradeFilms(userId, friendId);
-    }
-
-    private int compare(Film film1, Film film2) {
-        return film2.getLikes().size() - film1.getLikes().size();
-    }
-
-    private int compareGrade(Film film1, Film film2) {
-        return (int) (film2.getGrades().stream()
-                .mapToInt(Grade::getValue)
+    private int compareMark(Film film1, Film film2) {
+        return (int) ((film2.getMarks().stream()
+                .mapToInt(Mark::getMark)
                 .summaryStatistics()
                 .getAverage()
-                - film1.getGrades().stream()
-                .mapToInt(Grade::getValue)
+                - film1.getMarks().stream()
+                .mapToInt(Mark::getMark)
                 .summaryStatistics()
-                .getAverage());
+                .getAverage()) * 100);
     }
 
 }

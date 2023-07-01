@@ -46,14 +46,8 @@ public interface FilmStorage {
 
     List<Film> findSortFilmsByDirector(long directorId, String sortBy);
 
-    List<Film> findSortGradeFilmsByDirector(long directorId, String sortBy);
-
     List<Film> findSortFilmsBySubstring(String query, boolean isDirector, boolean isTitle);
 
-    List<Film> findSortGradeFilmsBySubstring(String query, boolean isDirector, boolean isTitle);
-
     List<Film> findCommonSortFilms(long userId, long friendId);
-
-    List<Film> findCommonSortGradeFilms(long userId, long friendId);
 
 }
