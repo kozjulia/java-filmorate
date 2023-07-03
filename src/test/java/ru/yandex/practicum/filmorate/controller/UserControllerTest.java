@@ -5,8 +5,8 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.FriendStorage;
-import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryFriendStorage;
-import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.MarkStorage;
+import ru.yandex.practicum.filmorate.storage.memoryImpl.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,7 +29,9 @@ class UserControllerTest {
     public void beforeEach() {
         InMemoryUserStorage storage = new InMemoryUserStorage();
         FriendStorage friendStorage = new InMemoryFriendStorage(storage);
-        UserService service = new UserService(storage, friendStorage, null, null, null);
+        InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
+        MarkStorage gradeStorage = new InMemoryMarkStorage();
+        UserService service = new UserService(storage, friendStorage, filmStorage, gradeStorage, null);
         controller = new UserController(service);
         InMemoryUserStorage.usersId = 0;
         user1 = new User("email1@mail.ru", "user1", LocalDate.of(1980, 01, 01));
@@ -60,7 +62,7 @@ class UserControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(user1));
-        assertEquals("Ошибка! Неверный e-mail.", exception.getMessage());
+        assertEquals("Ошибка! Неверный e-mail. Код ошибки: 30005", exception.getMessage());
         assertEquals(0, controller.findUsers().size(), "Пользователь найден.");
     }
 
@@ -72,7 +74,7 @@ class UserControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(user1));
-        assertEquals("Ошибка! Логин не может быть пустым и содержать пробелы.",
+        assertEquals("Ошибка! Логин не может быть пустым и содержать пробелы. Код ошибки: 30006",
                 exception.getMessage());
         assertEquals(0, controller.findUsers().size(), "Пользователь найден.");
     }
@@ -98,7 +100,7 @@ class UserControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(user1));
-        assertEquals("Ошибка! Дата рождения не может быть в будущем.",
+        assertEquals("Ошибка! Дата рождения не может быть в будущем. Код ошибки: 30007",
                 exception.getMessage());
         assertEquals(0, controller.findUsers().size(), "Пользователь найден.");
     }

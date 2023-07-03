@@ -29,5 +29,6 @@ public class Film {
     private Set<Genre> genres = new HashSet<>(); // жанры
     private RatingMPA mpa; // рейтинг Ассоциации кинокомпаний (МРА)
     private Set<Director> directors = new HashSet<>(); // режиссёры
+    private Set<Mark> marks = new HashSet<>(); // оценки
 
 }

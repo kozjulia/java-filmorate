@@ -4,10 +4,10 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.MarkStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryLikeStorage;
+import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryMarkStorage;
 import ru.yandex.practicum.filmorate.storage.memoryImpl.InMemoryUserStorage;
 
 import java.time.LocalDate;
@@ -31,8 +31,8 @@ class FilmControllerTest {
     public void beforeEach() {
         InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
         UserStorage userStorage = new InMemoryUserStorage();
-        LikeStorage likeStorage = new InMemoryLikeStorage(filmStorage);
-        FilmService service = new FilmService(filmStorage, userStorage, likeStorage, null);
+        MarkStorage markStorage = new InMemoryMarkStorage();
+        FilmService service = new FilmService(filmStorage, userStorage, markStorage, null);
         controller = new FilmController(service);
         InMemoryFilmStorage.filmsId = 0;
         film1 = new Film("film 1", "FIlm 1 description",
@@ -66,7 +66,7 @@ class FilmControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(film1));
-        assertEquals("Ошибка! Название не может быть пустым.", exception.getMessage());
+        assertEquals("Ошибка! Название не может быть пустым. Код ошибки: 30001", exception.getMessage());
         assertEquals(0, controller.findFilms().size(), "Фильм найден.");
     }
 
@@ -78,7 +78,7 @@ class FilmControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(film1));
-        assertEquals("Ошибка! Максимальная длина описания — 200 символов.",
+        assertEquals("Ошибка! Максимальная длина описания — 200 символов. Код ошибки: 30002",
                 exception.getMessage());
         assertEquals(0, controller.findFilms().size(), "Фильм найден.");
     }
@@ -91,7 +91,7 @@ class FilmControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(film1));
-        assertEquals("Ошибка! Дата релиза — не раньше 28 декабря 1895 года.",
+        assertEquals("Ошибка! Дата релиза — не раньше 28 декабря 1895 года. Код ошибки: 30003",
                 exception.getMessage());
         assertEquals(0, controller.findFilms().size(), "Фильм найден.");
     }
@@ -104,7 +104,7 @@ class FilmControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(film1));
-        assertEquals("Ошибка! Продолжительность фильма должна быть положительной.", exception.getMessage());
+        assertEquals("Ошибка! Продолжительность фильма должна быть положительной. Код ошибки: 30004", exception.getMessage());
         assertEquals(0, controller.findFilms().size(), "Фильм найден.");
     }
 

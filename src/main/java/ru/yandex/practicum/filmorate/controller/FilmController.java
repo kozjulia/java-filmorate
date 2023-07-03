@@ -7,8 +7,8 @@ import ru.yandex.practicum.filmorate.model.RatingMPA;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.util.ValidatorControllers;
 
-import javax.validation.Valid;
 import java.util.List;
+import javax.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,9 @@ public class FilmController {
 
     @PostMapping("/films")
     @Validated
-    // добавление фильма
+    /**
+     * добавление фильма
+     */
     public Film create(@Valid @RequestBody Film film) {
         film = ValidatorControllers.validateFilm(film);
         Film newFilm = filmService.create(film);
@@ -36,7 +38,9 @@ public class FilmController {
 
     @PutMapping("/films")
     @Validated
-    // обновление фильма
+    /**
+     * обновление фильма
+     */
     public Film update(@Valid @RequestBody Film film) {
         ValidatorControllers.validateFilm(film);
         Film newFilm = filmService.update(film);
@@ -46,7 +50,9 @@ public class FilmController {
 
     @DeleteMapping("/films")
     @Validated
-    // удаление фильма
+    /**
+     * удаление фильма
+     */
     public void delete(@Valid @RequestBody Film film) {
         filmService.delete(film);
         log.debug("Удалён фильм: {}", film);
@@ -54,14 +60,18 @@ public class FilmController {
 
     @DeleteMapping("/films/{filmId}")
     @Validated
-    // удаление фильма по id
+    /**
+     * удаление фильма по id
+     */
     public void deleteFilmById(@Valid @PathVariable long filmId) {
         filmService.deleteFilmById(filmId);
         log.debug("Удалён фильм c id: {}", filmId);
     }
 
     @GetMapping("/films")
-    // получение всех фильмов
+    /**
+     * получение всех фильмов
+     */
     public List<Film> findFilms() {
         List<Film> films = filmService.findFilms();
         log.debug("Получен список фильмов, количество = {}", films.size());
@@ -69,7 +79,9 @@ public class FilmController {
     }
 
     @GetMapping("/films/{filmId}")
-    // получение пользователя по id
+    /**
+     * получение пользователя по id
+     */
     public Film findFilmById(@PathVariable long filmId) {
         Film film = filmService.findFilmById(filmId);
         log.debug("Получен фильм с id = {}", filmId);
@@ -77,40 +89,49 @@ public class FilmController {
     }
 
     @PutMapping("/films/{id}/like/{userId}")
-    //  пользователь ставит лайк фильму
-    public boolean like(@PathVariable long id, @PathVariable long userId) {
-        if (filmService.like(id, userId)) {
-            log.debug("Пользователь id = {} лайкнул фильм id = {}", userId, id);
+    /**
+     * пользователь ставит лайк/оценку фильму
+     */
+    public boolean like(@PathVariable long id, @PathVariable long userId,
+                        @RequestParam(defaultValue = "6") Integer mark) {
+        if (filmService.like(id, userId, mark)) {
+            log.debug("Пользователь id = {} поставил оценку {} фильму id = {}", userId, mark, id);
             return true;
         }
         return false;
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
-    //  пользователь удаляет лайк
+    /**
+     * пользователь удаляет лайк/оценку
+     */
     public boolean dislike(@PathVariable long id, @PathVariable long userId) {
         if (filmService.dislike(id, userId)) {
-            log.debug("Пользователь id = {} удалил лайк с фильма id = {}", userId, id);
+            log.debug("Пользователь id = {} удалил оценку с фильма id = {}", userId, id);
             return true;
         }
         return false;
     }
 
     @GetMapping("/films/popular")
-    //  возвращает список из первых count фильмов по количеству лайков
-    //  если значение параметра count не задано, возвращает первые 10
-    //  фильтрация возможна по двум параметрам: по жанру, за указанный год
+    /**
+     * возвращение списка из первых count фильмов по количеству лайков,
+     * если значение параметра count не задано, возвращение первых 10,
+     * фильтрация возможна по двум параметрам: по жанру, за указанный год
+     */
     public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") int count,
                                        @RequestParam(required = false) Long genreId,
                                        @RequestParam(required = false) Integer year) {
         List<Film> films = filmService.findPopularFilms(count, genreId, year);
-        log.debug("Получен список из первых {} фильмов по количеству лайков, " +
+        log.debug("Получен список из первых {} фильмов по количеству оценок, " +
                 "количество = {}", count, films.size());
         return films;
     }
 
     @GetMapping("/genres")
-    // получение всех жанров
+    /**
+     * получение всех жанров
+     */
     public List<Genre> findGenres() {
         List<Genre> genres = filmService.findGenres();
         log.debug("Получен список жанров, количество = {}", genres.size());
@@ -118,7 +139,9 @@ public class FilmController {
     }
 
     @GetMapping("/genres/{id}")
-    // получение жанра по id
+    /**
+     * получение жанра по id
+     */
     public Genre findGenreById(@PathVariable long id) {
         Genre genre = filmService.findGenreById(id);
         log.debug("Получен жанр с id = {}", id);
@@ -126,7 +149,9 @@ public class FilmController {
     }
 
     @GetMapping("/mpa")
-    // получение всех рейтингов МПА
+    /**
+     * получение всех рейтингов МПА
+     */
     public List<RatingMPA> findRatingMPAs() {
         List<RatingMPA> ratingMPAs = filmService.findRatingMPAs();
         log.debug("Получен список рейтингов МПА, количество = {}", ratingMPAs.size());
@@ -134,7 +159,9 @@ public class FilmController {
     }
 
     @GetMapping("/mpa/{id}")
-    // получение рейтинга МПА по id
+    /**
+     * получение рейтинга МПА по id
+     */
     public RatingMPA findRatingMPAById(@PathVariable long id) {
         RatingMPA ratingMPA = filmService.findRatingMPAById(id);
         log.debug("Получен рейтинг МПА с id = {}", id);
@@ -142,7 +169,9 @@ public class FilmController {
     }
 
     @GetMapping("/directors")
-    // получение всех режиссёров
+    /**
+     * получение всех режиссёров
+     */
     public List<Director> findDirectors() {
         List<Director> directors = filmService.findDirectors();
         log.debug("Получен список режиссёров, количество = {}", directors.size());
@@ -150,7 +179,9 @@ public class FilmController {
     }
 
     @GetMapping("/directors/{id}")
-    // получение режиссёра по id
+    /**
+     * получение режиссёра по id
+     */
     public Director findDirectorById(@PathVariable long id) {
         Director director = filmService.findDirectorById(id);
         log.debug("Получен режиссёр с id = {}", id);
@@ -158,7 +189,9 @@ public class FilmController {
     }
 
     @PostMapping("/directors")
-    // добавление режиссёра
+    /**
+     * добавление режиссёра
+     */
     public Director createDirector(@RequestBody Director director) {
         director = ValidatorControllers.validateDirector(director);
         Director newDirector = filmService.createDirector(director);
@@ -167,7 +200,9 @@ public class FilmController {
     }
 
     @PutMapping("/directors")
-    // обновление режиссёра
+    /**
+     * обновление режиссёра
+     */
     public Director update(@RequestBody Director director) {
         director = ValidatorControllers.validateDirector(director);
         Director newDirector = filmService.updateDirector(director);
@@ -176,7 +211,9 @@ public class FilmController {
     }
 
     @DeleteMapping("/directors/{id}")
-    // удаление режиссёра
+    /**
+     * удаление режиссёра
+     */
     public boolean deleteDirector(@PathVariable long id) {
         if (filmService.deleteDirectorById(id)) {
             log.debug("Удалён режиссёр с id = {}", id);
@@ -186,7 +223,9 @@ public class FilmController {
     }
 
     @GetMapping("/films/director/{directorId}")
-    //  Возвращает список фильмов режиссёра, отсортированных по количеству лайков или году выпуска
+    /**
+     * возвращение списка фильмов режиссёра, отсортированных по количеству лайков или году выпуска
+     */
     public List<Film> findSortFilmsByDirector(@PathVariable long directorId, @RequestParam String sortBy) {
         List<Film> films = filmService.findSortFilmsByDirector(directorId, sortBy);
         log.debug("Получен отсортированный список фильмов по {}, " +
@@ -195,19 +234,25 @@ public class FilmController {
     }
 
     @GetMapping("/films/search")
-    // Возвращает список фильмов, отсортированных по популярности, который ищет по подстроке
+    /**
+     * возвращение списка фильмов, отсортированных по популярности, который ищется по подстроке
+     */
     public List<Film> findSortFilmsBySubstring(@RequestParam String query, @RequestParam String by) {
         List<Film> films = filmService.findSortFilmsBySubstring(query, by);
-        log.debug("Получен отсортированный список фильмов, который ищет подстроку \"{}\" в {}, " +
+        log.debug("Получен отсортированный список фильмов, который ищет подстроку {} в {}, " +
                 "количество = {}", query, by, films.size());
         return films;
     }
 
     @GetMapping("/films/common")
-    // Возвращает список общих фильмов, отсортированных по популярности.
-    public List<Film> findCommonSortedFilms(@RequestParam long userId, @RequestParam long friendId) {
-        List<Film> films = filmService.findCommonSortedFilms(userId, friendId);
-        log.debug("Получен список общих фильмов у пользователей {} и {}.", userId, friendId);
+    /**
+     * возвращение списка общих фильмов, отсортированных по популярности
+     */
+    public List<Film> findCommonSortFilms(@RequestParam long userId, @RequestParam long friendId) {
+        List<Film> films = filmService.findCommonSortFilms(userId, friendId);
+        log.debug("Получен список общих отсортированных фильмов " +
+                "у пользователей {} и {}.", userId, friendId);
         return films;
     }
+
 }

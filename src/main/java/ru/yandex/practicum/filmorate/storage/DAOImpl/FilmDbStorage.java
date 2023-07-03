@@ -2,10 +2,7 @@ package ru.yandex.practicum.filmorate.storage.DAOImpl;
 
 import ru.yandex.practicum.filmorate.exception.DirectorNotFoundException;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RatingMPA;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.Date;
@@ -181,16 +178,15 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.update(sqlQuery, directorId) > 0;
     }
 
-
     public List<Film> findSortFilmsByDirector(long directorId, String sortBy) {
         if (sortBy.equals("likes")) {
-            String sqlQuery = "select f.*, COUNT(l.user_id) as likes " +
+            String sqlQuery = "select f.*, AVG(g.mark) as avg_marks " +
                     "from films as f " +
                     "INNER JOIN film_director as fd ON fd.film_id = f.film_id " +
-                    "LEFT OUTER JOIN likes as l ON l.film_id = f.film_id " +
+                    "LEFT OUTER JOIN marks as g ON g.film_id = f.film_id " +
                     "where fd.director_id = ? " +
                     "GROUP BY f.film_id " +
-                    "ORDER by likes DESC";
+                    "ORDER by avg_marks DESC";
             return jdbcTemplate.query(sqlQuery, this::makeFilm, directorId);
         }
         if (sortBy.equals("year")) {
@@ -207,35 +203,35 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> findSortFilmsBySubstring(String query, boolean isDirector, boolean isTitle) {
         String where = "";
         String joinDirector = "LEFT OUTER JOIN film_director as fd ON fd.film_id = f.film_id " +
-                "LEFT OUTER  JOIN DIRECTORS as d ON d.director_id = fd.DIRECTOR_ID ";
+                "LEFT OUTER JOIN DIRECTORS as d ON d.director_id = fd.DIRECTOR_ID ";
         if (isDirector && isTitle) {
-            where = "WHERE  LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') OR " +
+            where = "WHERE LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') OR " +
                     "LOWER(d.DIRECTOR_NAME) LIKE LOWER('%" + query + "%') ";
         } else if (isDirector) {
             where = "WHERE LOWER(d.DIRECTOR_NAME) LIKE LOWER('%" + query + "%') ";
         } else if (isTitle) {
             joinDirector = "";
-            where = "WHERE  LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') ";
+            where = "WHERE LOWER(f.FILM_NAME) LIKE LOWER('%" + query + "%') ";
         }
 
-        String sqlQuery = "SELECT  f.*, COUNT(l.user_id) as likes " +
+        String sqlQuery = "SELECT  f.*, AVG(g.mark) as avg_marks " +
                 "FROM films as f " +
                 joinDirector +
-                "LEFT OUTER  JOIN likes as l ON l.film_id = f.film_id " +
+                "LEFT OUTER JOIN marks as g ON g.film_id = f.film_id " +
                 where +
                 "GROUP BY f.film_id " +
-                "ORDER BY likes DESC ";
+                "ORDER BY avg_marks DESC, f.film_id DESC";
         return jdbcTemplate.query(sqlQuery, this::makeFilm);
     }
 
-    public List<Film> findCommonSortedFilms(long userId, long friendId) {
-        String sqlQuery = "SELECT f.*, COUNT(l.user_id) as likes " +
+    public List<Film> findCommonSortFilms(long userId, long friendId) {
+        String sqlQuery = "SELECT f.*, AVG(g.mark) as avg_marks " +
                 "FROM films as f " +
-                "LEFT OUTER JOIN likes as l ON l.film_id = f.film_id " +
-                "WHERE f.film_id IN (SELECT l1.film_id FROM likes l1 WHERE l1.user_id = ?) " +
-                "AND f.film_id IN (SELECT l2.film_id FROM likes l2 WHERE l2.user_id = ?) " +
+                "LEFT OUTER JOIN marks as g ON g.film_id = f.film_id " +
+                "WHERE f.film_id IN (SELECT film_id FROM MARKS WHERE user_id = ?) " +
+                "AND f.film_id IN (SELECT film_id FROM MARKS WHERE user_id = ?) " +
                 "GROUP BY f.film_id " +
-                "ORDER BY likes DESC";
+                "ORDER BY avg_marks DESC ";
         return jdbcTemplate.query(sqlQuery, this::makeFilm, userId, friendId);
     }
 
@@ -320,4 +316,5 @@ public class FilmDbStorage implements FilmStorage {
     private Director makeDirector(ResultSet rs, int rowNum) throws SQLException {
         return new Director(rs.getLong("director_id"), rs.getString("director_name"));
     }
+
 }

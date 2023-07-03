@@ -18,6 +18,9 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
+    /**
+     * добавление нового отзыва
+     */
     public Review create(@Valid @RequestBody Review review) {
         Review newReview = reviewService.create(review);
         log.debug("Добавлен новый отзыв: {}", newReview);
@@ -25,6 +28,9 @@ public class ReviewController {
     }
 
     @PutMapping
+    /**
+     * обновление отзыва
+     */
     public Review update(@Valid @RequestBody Review review) {
         Review newReview = reviewService.update(review);
         log.debug("Обновлен отзыв: {}", newReview);
@@ -32,19 +38,28 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{reviewId}")
+    /**
+     * удаление отзыва
+     */
     public void delete(@PathVariable Long reviewId) {
         reviewService.delete(reviewId);
         log.debug("Удалён отзыв с ID: {}", reviewId);
     }
 
     @GetMapping("/{reviewId}")
+    /**
+     * получение отзыва по id
+     */
     public Review findReviewById(@PathVariable Long reviewId) {
         Review review = reviewService.findReviewById(reviewId);
-        log.debug("Получен фильм с id = {}", reviewId);
+        log.debug("Получен отзыв с id = {}", reviewId);
         return review;
     }
 
     @GetMapping
+    /**
+     * получение списка отзывов
+     */
     public List<Review> findReviews(@RequestParam(required = false) Long filmId,
                                     @RequestParam(defaultValue = "10", required = false) Integer count) {
         List<Review> reviews = reviewService.findReviews(filmId, count);
@@ -54,6 +69,9 @@ public class ReviewController {
     }
 
     @PutMapping("/{reviewId}/like/{userId}")
+    /**
+     * пользователь лайкнул отзыв
+     */
     public boolean addLike(@PathVariable Long reviewId, @PathVariable Long userId) {
         if (reviewService.increaseUseful(reviewId, userId)) {
             log.debug("Пользователь id = {} лайкнул отзыв id = {}", userId, reviewId);
@@ -63,6 +81,9 @@ public class ReviewController {
     }
 
     @PutMapping("/{reviewId}/dislike/{userId}")
+    /**
+     * пользователь дизлайкнул отзыв
+     */
     public boolean addDislike(@PathVariable Long reviewId, @PathVariable Long userId) {
         if (reviewService.decreaseUseful(reviewId, userId)) {
             log.debug("Пользователь id = {} дизлайкнул отзыв id = {}", userId, reviewId);
@@ -72,6 +93,9 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{reviewId}/like/{userId}")
+    /**
+     * пользователь удалил лайк на отзыв
+     */
     public boolean deleteLike(@PathVariable Long reviewId, @PathVariable Long userId) {
         if (reviewService.decreaseUseful(reviewId, userId)) {
             log.debug("Пользователь id = {} удалил лайк на отзыв id = {}", userId, reviewId);
@@ -81,6 +105,9 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{reviewId}/dislike/{userId}")
+    /**
+     * пользователь удалил дизлайк на отзыв
+     */
     public boolean deleteDislike(@PathVariable Long reviewId, @PathVariable Long userId) {
         if (reviewService.increaseUseful(reviewId, userId)) {
             log.debug("Пользователь id = {} удалил дизлайк на отзыв id = {}", userId, reviewId);

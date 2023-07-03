@@ -62,7 +62,7 @@ public class ReviewService {
         if (count < 0) {
             String message = "Параметр count не может быть отрицательным!";
             log.warn(message);
-            throw new ValidationException(message);
+            throw new ValidationException(message, 20001);
         }
         if (filmId != null && !filmStorage.isFindFilmById(filmId)) {
             return null;
