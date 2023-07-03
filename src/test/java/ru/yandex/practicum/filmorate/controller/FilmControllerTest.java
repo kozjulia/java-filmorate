@@ -66,7 +66,7 @@ class FilmControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(film1));
-        assertEquals("Ошибка! Название не может быть пустым.", exception.getMessage());
+        assertEquals("Ошибка! Название не может быть пустым. Код ошибки: 30001", exception.getMessage());
         assertEquals(0, controller.findFilms().size(), "Фильм найден.");
     }
 
@@ -78,7 +78,7 @@ class FilmControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(film1));
-        assertEquals("Ошибка! Максимальная длина описания — 200 символов.",
+        assertEquals("Ошибка! Максимальная длина описания — 200 символов. Код ошибки: 30002",
                 exception.getMessage());
         assertEquals(0, controller.findFilms().size(), "Фильм найден.");
     }
@@ -91,7 +91,7 @@ class FilmControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(film1));
-        assertEquals("Ошибка! Дата релиза — не раньше 28 декабря 1895 года.",
+        assertEquals("Ошибка! Дата релиза — не раньше 28 декабря 1895 года. Код ошибки: 30003",
                 exception.getMessage());
         assertEquals(0, controller.findFilms().size(), "Фильм найден.");
     }
@@ -104,7 +104,7 @@ class FilmControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(film1));
-        assertEquals("Ошибка! Продолжительность фильма должна быть положительной.", exception.getMessage());
+        assertEquals("Ошибка! Продолжительность фильма должна быть положительной. Код ошибки: 30004", exception.getMessage());
         assertEquals(0, controller.findFilms().size(), "Фильм найден.");
     }
 

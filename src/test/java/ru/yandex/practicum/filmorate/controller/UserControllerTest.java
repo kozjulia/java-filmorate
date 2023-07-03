@@ -62,7 +62,7 @@ class UserControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(user1));
-        assertEquals("Ошибка! Неверный e-mail.", exception.getMessage());
+        assertEquals("Ошибка! Неверный e-mail. Код ошибки: 30005", exception.getMessage());
         assertEquals(0, controller.findUsers().size(), "Пользователь найден.");
     }
 
@@ -74,7 +74,7 @@ class UserControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(user1));
-        assertEquals("Ошибка! Логин не может быть пустым и содержать пробелы.",
+        assertEquals("Ошибка! Логин не может быть пустым и содержать пробелы. Код ошибки: 30006",
                 exception.getMessage());
         assertEquals(0, controller.findUsers().size(), "Пользователь найден.");
     }
@@ -100,7 +100,7 @@ class UserControllerTest {
         final ValidationException exception = assertThrows(
                 ValidationException.class,
                 () -> controller.create(user1));
-        assertEquals("Ошибка! Дата рождения не может быть в будущем.",
+        assertEquals("Ошибка! Дата рождения не может быть в будущем. Код ошибки: 30007",
                 exception.getMessage());
         assertEquals(0, controller.findUsers().size(), "Пользователь найден.");
     }
