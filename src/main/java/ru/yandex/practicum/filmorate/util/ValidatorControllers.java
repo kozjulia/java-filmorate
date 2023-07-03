@@ -85,7 +85,7 @@ public class ValidatorControllers {
     }
 
     private static void logAndError(String exp, int errorCode) {
-        log.warn(exp);
+        log.warn(exp + " Код ошибки: " + errorCode);
         throw new ValidationException(exp, errorCode);
     }
 

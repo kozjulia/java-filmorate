@@ -93,7 +93,6 @@ public class FilmController {
      * пользователь ставит лайк/оценку фильму
      */
     public boolean like(@PathVariable long id, @PathVariable long userId,
-                        //@RequestParam(required = false) Integer mark) {
                         @RequestParam(defaultValue = "6") Integer mark) {
         if (filmService.like(id, userId, mark)) {
             log.debug("Пользователь id = {} поставил оценку {} фильму id = {}", userId, mark, id);
